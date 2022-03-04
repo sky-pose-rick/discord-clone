@@ -13,15 +13,15 @@ function Login() {
         </div>
         <div className="input-wrapper">
           <label htmlFor="login-password">PASSWORD</label>
-          <input name="password" id="login-password" type="text" required />
+          <input name="password" id="login-password" type="password" required />
         </div>
         {/* <div>Forgot your password?</div> */}
         <button type="submit">Login</button>
-        <div>
-          Need an account?
-          <a href="./register">Register</a>
-        </div>
       </form>
+      <div>
+        Need an account?
+        <a href="./register">Register</a>
+      </div>
     </div>
   );
 }
