@@ -1,30 +1,60 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
+import styled from 'styled-components';
+
+const FormBox = styled.div`{
+  background-color: #363940;
+  color: #9c9fa6;
+  margin: 20px 20px;
+  padding: 10px 40px;
+  width: 400px;
+}`;
+
+const FormH1 = styled.h1`{
+  color: white;
+}`;
+
+const LabelWrapper = styled.div`{
+  display: flex;
+  flex-direction: column;
+  margin: 5px;
+  gap: 5px;
+}`;
+
+const InputWrapper = styled.div`{
+  display: flex;
+}`;
+
+const FormInput = styled.input`{
+  width: 100%;
+}`;
 
 function Register() {
   return (
-    <div className="Register">
-      <h1>Create an account</h1>
+    <FormBox>
+      <FormH1>Create an account</FormH1>
       <form action="" method="POST">
-        <div className="input-wrapper">
+        <LabelWrapper>
           <label htmlFor="register-email">EMAIL</label>
-          <input name="email" id="register-email" type="email" required />
-        </div>
-        <div className="input-wrapper">
+          <InputWrapper><FormInput name="email" id="register-email" type="email" required /></InputWrapper>
+        </LabelWrapper>
+        <LabelWrapper>
           <label htmlFor="register-username">USERNAME</label>
-          <input name="username" id="register-username" type="text" required />
-        </div>
-        <div className="input-wrapper">
+          <InputWrapper><FormInput name="username" id="register-username" type="text" required /></InputWrapper>
+        </LabelWrapper>
+        <LabelWrapper className="input-wrapper">
           <label htmlFor="register-password">PASSWORD</label>
-          <input name="password" id="register-password" type="password" required />
-        </div>
+          <InputWrapper><FormInput name="password" id="register-password" type="password" required /></InputWrapper>
+        </LabelWrapper>
         {/* Nice to have: custom date selector */}
-        <div className="input-wrapper">
+        <LabelWrapper className="input-wrapper">
           <label htmlFor="register-month">DATE OF BIRTH</label>
-          <input name="register-month" type="text" required />
-          <input name="register-day" type="text" required />
-          <input name="register-year" type="text" required />
-        </div>
+          <InputWrapper>
+            <FormInput name="register-month" type="text" required />
+            <FormInput name="register-day" type="text" required />
+            <FormInput name="register-year" type="text" required />
+          </InputWrapper>
+        </LabelWrapper>
         <button type="submit">Continue</button>
       </form>
       <div>
@@ -33,7 +63,7 @@ function Register() {
       <div className="policy">
         By registering, you agree to not make a mess of this project.
       </div>
-    </div>
+    </FormBox>
   );
 }
 
