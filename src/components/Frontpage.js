@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Login from './login';
-import Register from './register';
+import Login from './Login';
+import Register from './Register';
 
 const LoginWrapper = styled.div`{
   background-image: url("discord-clone/img/nightsky.jpg");
