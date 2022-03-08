@@ -1,5 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import ServerIcon from './ServerIcon';
+
+const channelWidth = '200px';
 
 const ServerFrame = styled.div`{
   display: grid;
@@ -13,7 +16,10 @@ const ServerNav = styled.div`{
   background-color: #212226;
   color: white;
   grid-row: 1 / 5;
-  width: 75px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }`;
 
 const HeaderBar = styled.div`{
@@ -21,6 +27,9 @@ const HeaderBar = styled.div`{
   grid-template-columns: auto 1fr;
   grid-column: 2 / 5;
   color: white;
+  height: 30px;
+  box-shadow: black 0px 2px 5px 0px;
+  z-index: 1;
 
   div{
     background-color:#363940;
@@ -28,7 +37,7 @@ const HeaderBar = styled.div`{
 
   div:first-child{
     background-color:#303136;
-    width: 100px;
+    width: ${channelWidth};
   }
 }`;
 
@@ -42,7 +51,7 @@ const ChannelNav = styled.div`{
   grid-row: 2 / 4;
   background-color: #303136;
   color: white;
-  width: 100px;
+  width: ${channelWidth};
 }`;
 
 const UserPanel = styled.div`{
@@ -72,7 +81,7 @@ const InputBox = styled.div`{
 const UserList = styled.div`{
   background-color: #303136;
   color: white;
-  width: 100px;
+  width: ${channelWidth};
   grid-row: 2/5;
 }`;
 
@@ -80,12 +89,10 @@ function Home() {
   return (
     <ServerFrame>
       <ServerNav>
-        <div>SV 1</div>
-        <div>SV 2</div>
-        <div>SV 3</div>
-        <div>SV 4</div>
-        <div>SV 5</div>
-        <div>SV 6</div>
+        <ServerIcon serverName="Server 1" src="discord-clone/img/profile2.png" />
+        <ServerIcon serverName="Server 2" src="gone" alt="OOP" />
+        <ServerIcon serverName="Server 7" src="discord-clone/img/profile2.png" />
+        <ServerIcon serverName="Server 8" src="gone" alt="OOP" />
       </ServerNav>
       <HeaderBar>
         <div>Header1</div>
