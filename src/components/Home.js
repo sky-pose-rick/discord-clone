@@ -50,8 +50,14 @@ const HeaderBar = styled.div`{
     width: 190px;
   }
 
-  .hash {
-    color: gray;
+  .hashed-text{
+    display: flex;
+    align-items: center;
+  }
+
+  .hashed-text::before {
+    content: "#";
+    color: #6f747a;
     margin: 0px 10px;
     font-size: 2em; 
   }
@@ -90,8 +96,21 @@ const InputBox = styled.div`{
   background-color:#363940;
   color: white;
   grid-row: 3/5;
-  height: 60px;
+  height: 75px;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+
+  input{
+    width: 100%;
+    margin: 0px 20px;
+    height: 3em;
+    padding: 0px 10px;
+    background-color: #40454b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+  }
 }`;
 
 const UserList = styled.div`{
@@ -117,8 +136,7 @@ function Home() {
       <HeaderBar>
         <div>Server Name</div>
         <div>
-          <span className="hash">#</span>
-          <span className="channel">Channel-name</span>
+          <span className="hashed-text">My-channel</span>
         </div>
       </HeaderBar>
       <ChannelNav>
@@ -136,7 +154,7 @@ function Home() {
         Main Content
       </MainContent>
       <InputBox>
-        Input
+        <input type="text" placeholder="Message #Channel-name" />
       </InputBox>
       <UserList>
         UserList
