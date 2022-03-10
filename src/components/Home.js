@@ -27,17 +27,27 @@ const HeaderBar = styled.div`{
   grid-template-columns: auto 1fr;
   grid-column: 2 / 5;
   color: white;
-  height: 30px;
+  height: 3em;
   box-shadow: black 0px 2px 5px 0px;
   z-index: 1;
 
   div{
     background-color:#363940;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    padding-left: 10px;
   }
 
-  div:first-child{
-    background-color:#303136;
-    width: ${channelWidth};
+  div:first-child {
+    background-color: #303136;
+    width: 190px;
+  }
+
+  .hash {
+    color: gray;
+    margin: 0px 10px;
+    font-size: 2em; 
   }
 }`;
 
@@ -89,14 +99,18 @@ function Home() {
   return (
     <ServerFrame>
       <ServerNav>
+        <ServerIcon serverName="@me" src="gone" alt="@me" />
         <ServerIcon serverName="Server 1" src="discord-clone/img/profile2.png" />
         <ServerIcon serverName="Server 2" src="gone" alt="OOP" />
         <ServerIcon serverName="Server 7" src="discord-clone/img/profile2.png" />
         <ServerIcon serverName="Server 8" src="gone" alt="OOP" />
       </ServerNav>
       <HeaderBar>
-        <div>Header1</div>
-        <div>Header2</div>
+        <div>Server Name</div>
+        <div>
+          <span className="hash">#</span>
+          <span className="channel">Channel-name</span>
+        </div>
       </HeaderBar>
       <ChannelNav>
         <div>Channel 1</div>
