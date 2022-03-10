@@ -20,6 +20,12 @@ const ServerNav = styled.div`{
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  padding: 20px 0px;
+
+  .line{
+    border-bottom: solid 1px gray;
+    width: 50%;
+  }
 }`;
 
 const HeaderBar = styled.div`{
@@ -99,11 +105,14 @@ function Home() {
   return (
     <ServerFrame>
       <ServerNav>
-        <ServerIcon serverName="@me" src="gone" alt="@me" />
+        <ServerIcon serverName="Home" src="gone" alt="@me" />
+        <div className="line" />
         <ServerIcon serverName="Server 1" src="discord-clone/img/profile2.png" />
         <ServerIcon serverName="Server 2" src="gone" alt="OOP" />
         <ServerIcon serverName="Server 7" src="discord-clone/img/profile2.png" />
         <ServerIcon serverName="Server 8" src="gone" alt="OOP" />
+        <ServerIcon serverName="New Server" src="gone" alt="create" />
+        <ServerIcon serverName="Find Server" src="gone" alt="browse" />
       </ServerNav>
       <HeaderBar>
         <div>Server Name</div>
