@@ -47,7 +47,8 @@ const HeaderBar = styled.div`{
 
   div:first-child {
     background-color: #303136;
-    width: 190px;
+    width: ${channelWidth};
+    box-sizing: border-box;
   }
 
   .hashed-text{
@@ -74,6 +75,29 @@ const ChannelNav = styled.div`{
   background-color: #303136;
   color: white;
   width: ${channelWidth};
+  padding: 20px 5px;
+  box-sizing: border-box;
+  row-gap: 5px;
+}`;
+
+const Channel = styled.div`{
+  padding: 5px 5px;
+  border-radius: 5px;
+
+  &:hover{
+    background-color: #393c43;
+  }
+
+  .hashed-text{
+    display: flex;
+    align-items: center;
+  }
+
+  .hashed-text::before {
+    content: "#";
+    color: #6f747a;
+    padding: 0px 5px;
+  }
 }`;
 
 const UserPanel = styled.div`{
@@ -140,12 +164,15 @@ function Home() {
         </div>
       </HeaderBar>
       <ChannelNav>
-        <div>Channel 1</div>
-        <div>Channel 2</div>
-        <div>Channel 3</div>
-        <div>Channel 4</div>
-        <div>Channel 5</div>
-        <div>Channel 6</div>
+        <Channel>
+          <span className="hashed-text">My-channel</span>
+        </Channel>
+        <Channel><span className="hashed-text">Channel-1</span></Channel>
+        <Channel><span className="hashed-text">Channel-2</span></Channel>
+        <Channel><span className="hashed-text">Channel-3</span></Channel>
+        <Channel><span className="hashed-text">Channel-4</span></Channel>
+        <Channel><span className="hashed-text">Channel-5</span></Channel>
+        <Channel><span className="hashed-text">Channel-6</span></Channel>
       </ChannelNav>
       <UserPanel>
         User
