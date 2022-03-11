@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import ServerIcon from './ServerIcon';
+import Message from './Message';
 
 const channelWidth = '200px';
 
@@ -10,6 +11,7 @@ const ServerFrame = styled.div`{
   grid-template-rows: auto 1fr auto auto;
   min-height: 100vh;
   min-width: 100vw;
+  max-height: max(100vh, 200px);
 }`;
 
 const ServerNav = styled.div`{
@@ -21,6 +23,8 @@ const ServerNav = styled.div`{
   align-items: center;
   gap: 10px;
   padding: 20px 0px;
+  overflow: hidden scroll;
+  scrollbar-width: none;
 
   .line{
     border-bottom: solid 1px gray;
@@ -91,6 +95,8 @@ const ChannelNav = styled.div`{
   padding: 20px 5px;
   box-sizing: border-box;
   row-gap: 5px;
+  overflow: hidden scroll;
+  scrollbar-width: none;
 }`;
 
 const Channel = styled.div`{
@@ -139,6 +145,8 @@ const MainContent = styled.div`{
   grid-row: 2 / 3;
   grid-column: 3 / 4;
   overflow: hidden scroll;
+  padding-top:10px;
+  scrollbar-width: none;
 }`;
 
 const InputBox = styled.div`{
@@ -159,6 +167,7 @@ const InputBox = styled.div`{
     color: white;
     border: none;
     border-radius: 5px;
+    outline: none;
   }
 }`;
 
@@ -168,6 +177,36 @@ const UserList = styled.div`{
   width: ${channelWidth};
   grid-row: 2/5;
 }`;
+
+const message1 = {
+  user: 'User1',
+  timestamp: 'fifty-two',
+  content: [
+    'How are you?',
+    'Line #2',
+    'Thing three',
+    '4',
+    '5',
+    '6',
+  ],
+};
+
+const message2 = {
+  user: 'User2',
+  timestamp: '3:15am',
+  content: [
+    'short',
+  ],
+};
+
+const message3 = {
+  user: 'User3',
+  timestamp: 'Yesterday at 4:50pm',
+  content: [
+    'First',
+    'Second',
+  ],
+};
 
 function Home() {
   return (
@@ -205,7 +244,9 @@ function Home() {
         User
       </UserPanel>
       <MainContent>
-        Main Content
+        <Message user={message1.user} timestamp={message1.timestamp} content={message1.content} />
+        <Message user={message2.user} timestamp={message2.timestamp} content={message2.content} />
+        <Message user={message3.user} timestamp={message3.timestamp} content={message3.content} />
       </MainContent>
       <InputBox>
         <input type="text" placeholder="Message #Channel-name" />
