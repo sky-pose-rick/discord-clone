@@ -21,3 +21,15 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# api keys
+src/firebaseConfig.js
+
+# local testing files
+src/reference
+public/test-img
+firebase.json
+.firebaserc
+
+# firebase emulator logs
+*-debug.log
