@@ -37,30 +37,43 @@ const HeaderBar = styled.div`{
   box-shadow: black 0px 2px 5px 0px;
   z-index: 1;
 
-  div{
+  &>div{
     background-color:#363940;
     display: flex;
     align-items: center;
     font-weight: bold;
     padding-left: 10px;
+    gap: 20px;
   }
 
-  div:first-child {
+  &>div:first-child {
     background-color: #303136;
     width: ${channelWidth};
     box-sizing: border-box;
   }
 
-  .hashed-text{
+  .symbolled{
     display: flex;
     align-items: center;
   }
 
-  .hashed-text::before {
+  .symbolled::before {
     content: "#";
     color: #6f747a;
     margin: 0px 10px;
     font-size: 2em; 
+    font-weight: 100;
+  }
+
+  .channel-desc{
+    font-size: 0.8em;
+    font-weight: normal;
+    color: #b4aab5;
+  }
+
+  .line{
+    border-left: solid 1px gray;
+    height: 50%;
   }
 }`;
 
@@ -86,17 +99,29 @@ const Channel = styled.div`{
 
   &:hover{
     background-color: #393c43;
+
+    .symbolled{
+      color: #dee1d8;
+    }
+
+    .symbolled::after{
+      content: "G";
+      margin-left: auto;
+    }
   }
 
-  .hashed-text{
+  .symbolled{
     display: flex;
     align-items: center;
+    color: #85888f;
   }
 
-  .hashed-text::before {
+  .symbolled::before {
     content: "#";
     color: #6f747a;
     padding: 0px 5px;
+    font-size: 1.2em;
+    font-weight: 100;
   }
 }`;
 
@@ -160,19 +185,21 @@ function Home() {
       <HeaderBar>
         <div>Server Name</div>
         <div>
-          <span className="hashed-text">My-channel</span>
+          <span className="symbolled">My-channel</span>
+          <div className="line" />
+          <span className="channel-desc">Speak your piece</span>
         </div>
       </HeaderBar>
       <ChannelNav>
         <Channel>
-          <span className="hashed-text">My-channel</span>
+          <span className="symbolled">My-channel</span>
         </Channel>
-        <Channel><span className="hashed-text">Channel-1</span></Channel>
-        <Channel><span className="hashed-text">Channel-2</span></Channel>
-        <Channel><span className="hashed-text">Channel-3</span></Channel>
-        <Channel><span className="hashed-text">Channel-4</span></Channel>
-        <Channel><span className="hashed-text">Channel-5</span></Channel>
-        <Channel><span className="hashed-text">Channel-6</span></Channel>
+        <Channel><span className="symbolled">Channel-1</span></Channel>
+        <Channel><span className="symbolled">Channel-2</span></Channel>
+        <Channel><span className="symbolled">Channel-3</span></Channel>
+        <Channel><span className="symbolled">Channel-4</span></Channel>
+        <Channel><span className="symbolled">Channel-5</span></Channel>
+        <Channel><span className="symbolled">Channel-6</span></Channel>
       </ChannelNav>
       <UserPanel>
         User
