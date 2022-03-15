@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ServerIcon from './ServerIcon';
 import Message from './Message';
+import FirestoreUser from '../logic/FirestoreUser';
 
 import ServerStyles from '../component-styles/ServerStyles';
 
@@ -17,37 +18,47 @@ const {
   UserList,
 } = ServerStyles;
 
-const message1 = {
-  user: 'User1',
-  timestamp: 'fifty-two',
-  content: [
-    'How are you?',
-    'Line #2',
-    'Thing three',
-    '4',
-    '5',
-    '6',
-  ],
-};
+function useMessages() {
+  const [messages, setMessages] = useState([]);
 
-const message2 = {
-  user: 'User2',
-  timestamp: '3:15am',
-  content: [
-    'short',
-  ],
-};
+  // useEffect that updates with each render
+  useEffect(() => {
+    const onNewMessage = (message) => {
+      // console.log('old messages:', messages);
+      // console.log('onNewMessage:', message);
+      const newArray = [...messages];
+      newArray.push(message);
+      setMessages(newArray);
+      // console.log(newArray.length);
+    };
 
-const message3 = {
-  user: 'User3',
-  timestamp: 'Yesterday at 4:50pm',
-  content: [
-    'First',
-    'Second',
-  ],
-};
+    FirestoreUser.subscribeToMessages(onNewMessage);
+
+    return () => {
+      FirestoreUser.unSubscribeToMessages();
+    };
+  });
+
+  return messages;
+}
+
+function textSubmit(e) {
+  // console.log(e);
+  if (e.code === 'Enter') {
+    FirestoreUser.sendMessage({
+      content: e.target.value,
+      timestamp: 'Now',
+      user: 'Third User',
+    });
+    e.target.value = '';
+    e.stopPropagation();
+  }
+}
 
 function Home() {
+  const messages = useMessages();
+  // console.log('render: ', messages);
+
   return (
     <ServerFrame>
       <ServerNav>
@@ -84,23 +95,18 @@ function Home() {
       </UserPanel>
       <MainContent>
         {
-          message1.content.map((text, index) => (
-            <Message user={message1.user} timestamp={message1.timestamp} content={text} key={`mess1${index}`} />
-          ))
-        }
-        {
-          message2.content.map((text, index) => (
-            <Message user={message2.user} timestamp={message2.timestamp} content={text} key={`mess2${index}`} />
-          ))
-        }
-        {
-          message3.content.map((text, index) => (
-            <Message user={message3.user} timestamp={message3.timestamp} content={text} key={`mess3${index}`} />
+          messages.map((message, index) => (
+            <Message
+              user={message.user}
+              timestamp={message.timestamp}
+              content={message.content}
+              key={`message-${index}`}
+            />
           ))
         }
       </MainContent>
       <InputBox>
-        <input type="text" placeholder="Message #Channel-name" />
+        <input type="text" placeholder="Message #Channel-name" onKeyUp={textSubmit} />
       </InputBox>
       <UserList>
         UserList
