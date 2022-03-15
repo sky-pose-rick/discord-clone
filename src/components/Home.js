@@ -245,18 +245,18 @@ function Home() {
       </UserPanel>
       <MainContent>
         {
-          message1.content.map((text) => (
-            <Message user={message1.user} timestamp={message1.timestamp} content={text} />
+          message1.content.map((text, index) => (
+            <Message user={message1.user} timestamp={message1.timestamp} content={text} key={`mess1${index}`} />
           ))
         }
         {
-          message2.content.map((text) => (
-            <Message user={message2.user} timestamp={message2.timestamp} content={text} />
+          message2.content.map((text, index) => (
+            <Message user={message2.user} timestamp={message2.timestamp} content={text} key={`mess2${index}`} />
           ))
         }
         {
-          message3.content.map((text) => (
-            <Message user={message3.user} timestamp={message3.timestamp} content={text} />
+          message3.content.map((text, index) => (
+            <Message user={message3.user} timestamp={message3.timestamp} content={text} key={`mess3${index}`} />
           ))
         }
       </MainContent>
