@@ -244,9 +244,21 @@ function Home() {
         User
       </UserPanel>
       <MainContent>
-        <Message user={message1.user} timestamp={message1.timestamp} content={message1.content} />
-        <Message user={message2.user} timestamp={message2.timestamp} content={message2.content} />
-        <Message user={message3.user} timestamp={message3.timestamp} content={message3.content} />
+        {
+          message1.content.map((text) => (
+            <Message user={message1.user} timestamp={message1.timestamp} content={text} />
+          ))
+        }
+        {
+          message2.content.map((text) => (
+            <Message user={message2.user} timestamp={message2.timestamp} content={text} />
+          ))
+        }
+        {
+          message3.content.map((text) => (
+            <Message user={message3.user} timestamp={message3.timestamp} content={text} />
+          ))
+        }
       </MainContent>
       <InputBox>
         <input type="text" placeholder="Message #Channel-name" />

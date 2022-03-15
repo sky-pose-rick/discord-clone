@@ -8,7 +8,7 @@ const MessageBox = styled.div`{
   grid-template-columns: auto 1fr;
   margin: 10px 0px;
 
-  p:hover{
+  &:hover{
     background-color: gray;
   }
 
@@ -46,6 +46,7 @@ const MessageHeader = styled.div`{
 function Message(props) {
   const { user, timestamp, content } = props;
 
+  // TODO: remove username and image for consecutive messages
   return (
     <MessageBox>
       <ImageWrapper>
@@ -55,11 +56,7 @@ function Message(props) {
         <span>{user}</span>
         <span>{timestamp}</span>
       </MessageHeader>
-      <div>
-        {content.map((entry) => (
-          <p>{entry}</p>
-        ))}
-      </div>
+      <p>{content}</p>
     </MessageBox>
   );
 }
@@ -67,11 +64,11 @@ function Message(props) {
 Message.propTypes = {
   user: propTypes.string.isRequired,
   timestamp: propTypes.string.isRequired,
-  content: propTypes.arrayOf(propTypes.string),
+  content: propTypes.string,
 };
 
 Message.defaultProps = {
-  content: ['missing'],
+  content: 'missing',
 };
 
 export default Message;
