@@ -136,14 +136,15 @@ const UserPanel = styled.div`{
   height: 40px;
 }`;
 
-const MainContent = styled.div`{
+const MainContent = styled.main`{
   background-color: #363940;
   color: white;
   grid-row: 2 / 3;
   grid-column: 3 / 4;
   overflow: hidden scroll;
   padding-top:10px;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: #313235 #42454a;
 }`;
 
 const InputBox = styled.div`{
