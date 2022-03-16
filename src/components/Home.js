@@ -78,9 +78,9 @@ function Home() {
       <ServerNav>
         <ServerIcon serverName="Home" src="gone" alt="@me" />
         <div className="line" />
-        <ServerIcon serverName="Server 1" src="discord-clone/img/profile2.png" />
+        <ServerIcon serverName="Server 1" src="/discord-clone/img/profile2.png" />
         <ServerIcon serverName="Server 2" src="gone" alt="OOP" />
-        <ServerIcon serverName="Server 7" src="discord-clone/img/profile2.png" />
+        <ServerIcon serverName="Server 7" src="/discord-clone/img/profile2.png" />
         <ServerIcon serverName="Server 8" src="gone" alt="OOP" />
         <ServerIcon serverName="New Server" src="gone" alt="create" />
         <ServerIcon serverName="Find Server" src="gone" alt="browse" />
