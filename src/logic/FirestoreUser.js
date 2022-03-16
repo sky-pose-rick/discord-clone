@@ -9,12 +9,21 @@ function displayMessage(message) {
     console.error('Blank message submitted');
     return;
   }
-  messageSubscriber(message);
+  messageSubscriber.onNewMessage(message);
   // console.log('sent:', message);
 }
 
 function sendMessage(message) {
   displayMessage(message);
+}
+
+function deleteMessage(key) {
+  if (!messageSubscriber) {
+    console.error('Missing message subscriber');
+    return;
+  }
+
+  messageSubscriber.onDeleteMessage(key);
 }
 
 function unSubscribeToMessages() {
@@ -24,11 +33,13 @@ function unSubscribeToMessages() {
   // console.log('Unsubscribed to messages');
 }
 
-function subscribeToMessages(onNewMessage) {
+function subscribeToMessages(onNewMessage, onChangeMessage, onDeleteMessage) {
   // should start listening to firestore snapshots here
 
-  messageSubscriber = onNewMessage;
+  messageSubscriber = { onNewMessage, onChangeMessage, onDeleteMessage };
   // console.log('Got a subscription to messages');
 }
 
-export default { sendMessage, unSubscribeToMessages, subscribeToMessages };
+export default {
+  sendMessage, unSubscribeToMessages, subscribeToMessages, deleteMessage,
+};

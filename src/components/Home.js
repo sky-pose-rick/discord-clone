@@ -32,7 +32,21 @@ function useMessages() {
       // console.log(newArray.length);
     };
 
-    FirestoreUser.subscribeToMessages(onNewMessage);
+    const onDeleteMessage = (key) => {
+      const index = messages.findIndex((message) => key === message.key);
+
+      // don't need to update message content
+      if (index > -1) {
+        const newArray = [...messages];
+        const newMessage = { ...messages[index] };
+        newMessage.deleted = true;
+        newArray[index] = newMessage;
+        setMessages(newArray);
+      }
+    };
+    const onChangeMessage = () => {};
+
+    FirestoreUser.subscribeToMessages(onNewMessage, onChangeMessage, onDeleteMessage);
 
     return () => {
       FirestoreUser.unSubscribeToMessages();
@@ -100,6 +114,7 @@ function Home() {
               user={message.user}
               timestamp={message.timestamp}
               content={message.content}
+              deleted={message.deleted}
               key={`message-${index}`}
             />
           ))

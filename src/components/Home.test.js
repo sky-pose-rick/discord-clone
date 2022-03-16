@@ -3,17 +3,19 @@ import { act } from 'react-dom/test-utils';
 import FirestoreUser from '../logic/FirestoreUser';
 import Home from './Home';
 
-function makeMessage(user, timestamp, content) {
-  return { user, timestamp, content };
+function makeMessage(user, timestamp, content, key) {
+  return {
+    user, timestamp, content, key,
+  };
 }
 
 function sampleData() {
   // messages for a single server
   const messages = [
-    makeMessage('User1', '1:00pm', 'Hello World!'),
-    makeMessage('User1', '1:01pm', 'Me again'),
-    makeMessage('User2', '1:02pm', 'Replying'),
-    makeMessage('User1', '1:03pm', 'Final Message'),
+    makeMessage('User1', '1:00pm', 'Hello World!', 'id1'),
+    makeMessage('User1', '1:01pm', 'Me again', 'id2'),
+    makeMessage('User2', '1:02pm', 'Replying', 'id3'),
+    makeMessage('User1', '1:03pm', 'Final Message', 'id4'),
   ];
 
   return messages;
@@ -66,7 +68,16 @@ describe('Basic actions', () => {
   });
 
   // it.todo('Message can appear from another source');
-  it.todo('Message can be deleted from another source');
+  it('Message can be deleted from another source', () => {
+    render(<Home />);
+
+    sendInitialMessages();
+
+    act(() => { FirestoreUser.deleteMessage('id2'); });
+
+    screen.getByText(/<deleted>/i);
+  });
+
   it.todo('Can change to another channel');
   it.todo('Can display line breaks within a single message');
 });

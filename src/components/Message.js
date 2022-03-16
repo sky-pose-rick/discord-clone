@@ -44,7 +44,9 @@ const MessageHeader = styled.div`{
 }`;
 
 function Message(props) {
-  const { user, timestamp, content } = props;
+  const {
+    user, timestamp, content, deleted,
+  } = props;
 
   // TODO: remove username and image for consecutive messages
   return (
@@ -56,7 +58,7 @@ function Message(props) {
         <span>{user}</span>
         <span>{timestamp}</span>
       </MessageHeader>
-      <p>{content}</p>
+      <p>{deleted ? '<deleted>' : content}</p>
     </MessageBox>
   );
 }
@@ -65,10 +67,12 @@ Message.propTypes = {
   user: propTypes.string.isRequired,
   timestamp: propTypes.string.isRequired,
   content: propTypes.string,
+  deleted: propTypes.bool,
 };
 
 Message.defaultProps = {
   content: 'missing',
+  deleted: false,
 };
 
 export default Message;
