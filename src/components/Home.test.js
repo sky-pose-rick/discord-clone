@@ -19,6 +19,14 @@ function sampleData() {
   return messages;
 }
 
+function sendInitialMessages() {
+  const messages = sampleData();
+
+  messages.forEach((message) => {
+    act(() => { FirestoreUser.sendMessage(message); });
+  });
+}
+
 it('Server renders', () => {
   render(<Home />);
 });
@@ -27,12 +35,7 @@ it('Server renders', () => {
 describe('Basic actions', () => {
   it('Can load messages', () => {
     render(<Home />);
-
-    const messages = sampleData();
-
-    messages.forEach((message) => {
-      act(() => { FirestoreUser.sendMessage(message); });
-    });
+    sendInitialMessages();
 
     screen.getByText(/hello world/i);
   });
@@ -47,7 +50,22 @@ describe('Basic actions', () => {
     expect(input.value).toEqual('');
     screen.getByText(/my message/i);
   });
-  it.todo('Message can appear from another source');
+
+  it('Blank messages should be blocked', () => {
+    render(<Home />);
+
+    sendInitialMessages();
+
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: '' } });
+    fireEvent.keyUp(input, { code: 'Enter' });
+
+    expect(input.value).toEqual('');
+    const main = screen.getByRole('main');
+    expect(main.children.length).toBe(4);
+  });
+
+  // it.todo('Message can appear from another source');
   it.todo('Message can be deleted from another source');
   it.todo('Can change to another channel');
   it.todo('Can display line breaks within a single message');

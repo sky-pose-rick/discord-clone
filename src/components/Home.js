@@ -21,7 +21,7 @@ const {
 function useMessages() {
   const [messages, setMessages] = useState([]);
 
-  // useEffect that updates with each render
+  // useEffect needs to be called when state changes in order to update callback
   useEffect(() => {
     const onNewMessage = (message) => {
       // console.log('old messages:', messages);
@@ -37,14 +37,14 @@ function useMessages() {
     return () => {
       FirestoreUser.unSubscribeToMessages();
     };
-  });
+  }, [messages]);
 
   return messages;
 }
 
 function textSubmit(e) {
   // console.log(e);
-  if (e.code === 'Enter') {
+  if (e.code === 'Enter' && e.target.value) {
     FirestoreUser.sendMessage({
       content: e.target.value,
       timestamp: 'Now',
