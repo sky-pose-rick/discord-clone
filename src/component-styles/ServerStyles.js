@@ -11,7 +11,7 @@ const ServerFrame = styled.div`{
   max-height: max(100vh, 200px);
 }`;
 
-const ServerNav = styled.div`{
+const ServerNav = styled.nav`{
   background-color: #212226;
   color: white;
   grid-row: 1 / 5;
@@ -78,7 +78,7 @@ const HeaderBar = styled.div`{
   }
 }`;
 
-const ChannelNav = styled.div`{
+const ChannelNav = styled.nav`{
   display: grid;
   grid-template-columns: auto;
   grid-auto-rows: auto;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import ServerIcon from './ServerIcon';
 import Message from './Message';
@@ -26,8 +27,11 @@ function useMessages() {
     const onNewMessage = (message) => {
       // console.log('old messages:', messages);
       // console.log('onNewMessage:', message);
+
+      // mutate message directly in case multiple calls are made
+      messages.push(message);
+      // spread to flag a re-render
       const newArray = [...messages];
-      newArray.push(message);
       setMessages(newArray);
       // console.log(newArray.length);
     };
@@ -37,10 +41,10 @@ function useMessages() {
 
       // don't need to update message content
       if (index > -1) {
+        // mutate message directly in case multiple calls are made
+        messages[index].deleted = true;
+        // spread to flag a re-render
         const newArray = [...messages];
-        const newMessage = { ...messages[index] };
-        newMessage.deleted = true;
-        newArray[index] = newMessage;
         setMessages(newArray);
       }
     };
@@ -54,6 +58,44 @@ function useMessages() {
   }, [messages]);
 
   return messages;
+}
+
+function useServers() {
+  const [servers, setServers] = useState([]);
+
+  const onReplaceServerList = (list) => {
+    const newServers = [...list];
+    setServers(newServers);
+  };
+
+  useEffect(() => {
+    FirestoreUser.subscribeToServers(onReplaceServerList);
+
+    return () => {
+      FirestoreUser.unSubscribeToServers();
+    };
+  }, [servers]);
+
+  return servers;
+}
+
+function useChannels(serverKey) {
+  const [channels, setChannels] = useState([]);
+
+  const onReplaceChannelList = (list) => {
+    const newChannels = [...list];
+    setChannels(newChannels);
+  };
+
+  useEffect(() => {
+    FirestoreUser.subscribeToChannels(serverKey, onReplaceChannelList);
+
+    return () => {
+      FirestoreUser.unSubscribeToChannels();
+    };
+  }, [channels]);
+
+  return channels;
 }
 
 function textSubmit(e) {
@@ -70,7 +112,14 @@ function textSubmit(e) {
 }
 
 function Home() {
-  const messages = useMessages();
+  const params = useParams();
+  const { serverKey, channelKey } = params;
+
+  const servers = useServers();
+  const channels = useChannels(serverKey);
+  const messages = useMessages(serverKey, channelKey);
+
+  const navigate = useNavigate();
   // console.log('render: ', messages);
 
   return (
@@ -78,10 +127,14 @@ function Home() {
       <ServerNav>
         <ServerIcon serverName="Home" src="gone" alt="@me" />
         <div className="line" />
-        <ServerIcon serverName="Server 1" src="/discord-clone/img/profile2.png" />
-        <ServerIcon serverName="Server 2" src="gone" alt="OOP" />
-        <ServerIcon serverName="Server 7" src="/discord-clone/img/profile2.png" />
-        <ServerIcon serverName="Server 8" src="gone" alt="OOP" />
+        {servers.map((server) => (
+          <ServerIcon
+            key={server.serverKey}
+            serverName={server.serverName}
+            src={server.iconURL}
+            alt={server.altText}
+          />
+        ))}
         <ServerIcon serverName="New Server" src="gone" alt="create" />
         <ServerIcon serverName="Find Server" src="gone" alt="browse" />
       </ServerNav>
@@ -94,15 +147,13 @@ function Home() {
         </div>
       </HeaderBar>
       <ChannelNav>
-        <Channel>
-          <span className="symbolled">My-channel</span>
-        </Channel>
-        <Channel><span className="symbolled">Channel-1</span></Channel>
-        <Channel><span className="symbolled">Channel-2</span></Channel>
-        <Channel><span className="symbolled">Channel-3</span></Channel>
-        <Channel><span className="symbolled">Channel-4</span></Channel>
-        <Channel><span className="symbolled">Channel-5</span></Channel>
-        <Channel><span className="symbolled">Channel-6</span></Channel>
+        {channels.map((channel) => (
+          <Link to={`/discord-clone/server/server-1/${channel.channelKey}`} key={channel.channelKey}>
+            <Channel>
+              <span className="symbolled">{channel.channelName}</span>
+            </Channel>
+          </Link>
+        ))}
       </ChannelNav>
       <UserPanel>
         User

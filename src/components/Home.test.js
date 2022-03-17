@@ -1,49 +1,40 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import React from 'react';
+import {
+  render, screen, fireEvent, within,
+} from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { act } from 'react-dom/test-utils';
 import FirestoreUser from '../logic/FirestoreUser';
 import Home from './Home';
 
-function makeMessage(user, timestamp, content, key) {
-  return {
-    user, timestamp, content, key,
-  };
+function renderWithRouter() {
+  render(
+    <MemoryRouter>
+      <Home />
+    </MemoryRouter>,
+  );
 }
 
-function sampleData() {
-  // messages for a single server
-  const messages = [
-    makeMessage('User1', '1:00pm', 'Hello World!', 'id1'),
-    makeMessage('User1', '1:01pm', 'Me again', 'id2'),
-    makeMessage('User2', '1:02pm', 'Replying', 'id3'),
-    makeMessage('User1', '1:03pm', 'Final Message', 'id4'),
-  ];
-
-  return messages;
-}
-
-function sendInitialMessages() {
-  const messages = sampleData();
-
-  messages.forEach((message) => {
-    act(() => { FirestoreUser.sendMessage(message); });
-  });
+function setDummyData() {
+  act(() => { FirestoreUser.pushTestContent(); });
 }
 
 it('Server renders', () => {
-  render(<Home />);
+  renderWithRouter();
 });
 
 // basic functions
 describe('Basic actions', () => {
   it('Can load messages', () => {
-    render(<Home />);
-    sendInitialMessages();
+    renderWithRouter();
+    setDummyData();
 
     screen.getByText(/hello world/i);
   });
 
   it('Can submit a message that appears', () => {
-    render(<Home />);
+    renderWithRouter();
+    setDummyData();
 
     const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'My message.' } });
@@ -54,9 +45,8 @@ describe('Basic actions', () => {
   });
 
   it('Blank messages should be blocked', () => {
-    render(<Home />);
-
-    sendInitialMessages();
+    renderWithRouter();
+    setDummyData();
 
     const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: '' } });
@@ -69,17 +59,30 @@ describe('Basic actions', () => {
 
   // it.todo('Message can appear from another source');
   it('Message can be deleted from another source', () => {
-    render(<Home />);
-
-    sendInitialMessages();
+    renderWithRouter();
+    setDummyData();
 
     act(() => { FirestoreUser.deleteMessage('id2'); });
 
     screen.getByText(/<deleted>/i);
   });
 
-  it.todo('Can change to another channel');
+  it('Channel list has links to channels', () => {
+    // put servers and channels in navs
+    renderWithRouter();
+    setDummyData();
+
+    const navs = screen.getAllByRole('navigation');
+    // console.log(navs);
+    const channelList = within(navs[1]).getAllByRole('link');
+    // dummy data has 5 channels
+    expect(channelList.length).toBe(5);
+  });
+
+  it.todo('Correct channel is "active"');
   it.todo('Can display line breaks within a single message');
+  it.todo('Scroll up to fetch more messages');
+  it.todo('Display a message when the top of channel is reached');
 });
 
 // actions that require authentication
