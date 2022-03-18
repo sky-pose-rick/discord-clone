@@ -154,18 +154,20 @@ const InputBox = styled.div`{
   height: 75px;
   overflow: hidden;
   display: flex;
-  align-items: center;
+  align-items: baseline;
 
   textarea{
     width: 100%;
     margin: 0px 20px;
-    height: 3em;
-    padding: 0px 10px;
+    height: 1em;
+    padding: 1em 10px;
     background-color: #40454b;
     color: white;
     border: none;
     border-radius: 5px;
     outline: none;
+    resize: none;
+    font-family: inherit;
   }
 }`;
 
