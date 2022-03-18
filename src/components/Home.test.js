@@ -41,7 +41,7 @@ describe('Basic actions', () => {
     setDummyData();
 
     const input = screen.getByRole('textbox');
-    fireEvent.change(input, { target: { value: 'My message.' } });
+    fireEvent.change(input, { target: { value: 'My message.\n' } });
     fireEvent.keyUp(input, { code: 'Enter' });
 
     expect(input.value).toEqual('');
@@ -53,11 +53,19 @@ describe('Basic actions', () => {
     setDummyData();
 
     const input = screen.getByRole('textbox');
-    fireEvent.change(input, { target: { value: '' } });
+    fireEvent.change(input, { target: { value: '\n' } });
     fireEvent.keyUp(input, { code: 'Enter' });
 
     expect(input.value).toEqual('');
     const main = screen.getByRole('main');
+    expect(main.children.length).toBe(4);
+
+    fireEvent.change(input, { target: { value: '\n\n' } });
+    fireEvent.keyUp(input, { code: 'Enter' });
+    expect(main.children.length).toBe(4);
+
+    fireEvent.change(input, { target: { value: '   \n' } });
+    fireEvent.keyUp(input, { code: 'Enter' });
     expect(main.children.length).toBe(4);
   });
 
@@ -120,11 +128,12 @@ describe('Basic actions', () => {
     setDummyData();
 
     const input = screen.getByRole('textbox');
-    fireEvent.change(input, { target: { value: 'My message.' } });
+    const multiLineString = 'My\nmulti\nline\nRomeo.';
+    console.log(multiLineString);
+    fireEvent.change(input, { target: { value: multiLineString } });
     fireEvent.keyUp(input, { code: 'Enter' });
-
-    expect(input.value).toEqual('');
-    screen.getByText(/my message/i);
+    const messageElem = screen.getByText(/romeo/i);
+    expect(messageElem.previousSibling.innerHTML).toMatch('line');
   });
   it.todo('Scroll up to fetch more messages');
   it.todo('Display a message when the top of channel is reached');

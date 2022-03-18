@@ -104,12 +104,17 @@ function useChannels(serverKey) {
 
 function textSubmit(e) {
   // console.log(e);
-  if (e.code === 'Enter' && e.target.value) {
+  const textContent = e.target.value.trim();
+  if (e.code === 'Enter' && textContent) {
+    // console.log(textContent);
     FirestoreUser.sendMessage({
-      content: e.target.value,
+      content: textContent,
       timestamp: 'Now',
       user: 'Third User',
     });
+    e.target.value = '';
+    e.stopPropagation();
+  } else if (e.code === 'Enter' && !textContent) {
     e.target.value = '';
     e.stopPropagation();
   }
@@ -185,7 +190,7 @@ function Home() {
         }
       </MainContent>
       <InputBox>
-        <input type="text" placeholder="Message #Channel-name" onKeyUp={textSubmit} />
+        <textarea type="text" placeholder="Message #Channel-name" onKeyUp={textSubmit} />
       </InputBox>
       <UserList>
         UserList

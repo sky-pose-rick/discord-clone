@@ -107,7 +107,7 @@ function pushTestContent() {
       makeMessage('User1', '1:00pm', 'Hello World!', 'id1'),
       makeMessage('User1', '1:01pm', 'Me again', 'id2'),
       makeMessage('User2', '1:02pm', 'Replying', 'id3'),
-      makeMessage('User1', '1:03pm', 'Final Message', 'id4'),
+      makeMessage('User1', '1:03pm', 'Final\nMessage\nWith\nMultiple\nLines\n', 'id4'),
     ];
 
     messages.forEach((message) => {

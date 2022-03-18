@@ -48,6 +48,8 @@ function Message(props) {
     user, timestamp, content, deleted,
   } = props;
 
+  const linedContent = content.split('\n');
+
   // TODO: remove username and image for consecutive messages
   return (
     <MessageBox>
@@ -58,7 +60,12 @@ function Message(props) {
         <span>{user}</span>
         <span>{timestamp}</span>
       </MessageHeader>
-      <p>{deleted ? '<deleted>' : content}</p>
+      <div>
+        {deleted && <p>{'<deleted>'}</p>}
+        {!deleted
+          // eslint-disable-next-line react/no-array-index-key
+          && linedContent.map((segment, index) => (<p key={index}>{segment}</p>))}
+      </div>
     </MessageBox>
   );
 }
