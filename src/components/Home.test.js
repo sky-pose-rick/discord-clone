@@ -12,6 +12,8 @@ function renderWithRouter() {
     <MemoryRouter initialEntries={['/discord-clone/server/server-1/channel-1']}>
       <Routes>
         <Route path="/discord-clone/server/:serverKey/:channelKey" element={<Home />} />
+        <Route path="/discord-clone/server/:serverKey" element={<Home />} />
+        <Route path="/discord-clone/server" element={<Home />} />
       </Routes>
     </MemoryRouter>,
   );
@@ -113,7 +115,17 @@ describe('Basic actions', () => {
     expect(secondActiveServer.href).toMatch(/server-2/i);
   });
 
-  it.todo('Can display line breaks within a single message');
+  it('Can display line breaks within a single message', () => {
+    renderWithRouter();
+    setDummyData();
+
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: 'My message.' } });
+    fireEvent.keyUp(input, { code: 'Enter' });
+
+    expect(input.value).toEqual('');
+    screen.getByText(/my message/i);
+  });
   it.todo('Scroll up to fetch more messages');
   it.todo('Display a message when the top of channel is reached');
 });

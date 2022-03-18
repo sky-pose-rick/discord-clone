@@ -17,7 +17,10 @@ function App() {
         <Route path="/discord-clone/register" element={<LoginRegister register />} />
         <Route path="/discord-clone/login" element={<LoginRegister register={false} />} />
         <Route path="/discord-clone/@me/:chatKey" element={<Home />} />
+        <Route path="/discord-clone/@me" element={<Home />} />
         <Route path="/discord-clone/server/:serverKey/:channelKey" element={<Home />} />
+        <Route path="/discord-clone/server/:serverKey" element={<Home />} />
+        <Route path="/discord-clone/server" element={<Home />} />
         <Route path="/discord-clone/discovery" element={<Home />} />
         <Route path="*" element={<Fallback />} />
       </Routes>
