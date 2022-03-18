@@ -28,12 +28,12 @@ function useMessages() {
       // console.log('old messages:', messages);
       // console.log('onNewMessage:', message);
 
-      // mutate message directly in case multiple calls are made
-      messages.push(message);
-      // spread to flag a re-render
-      const newArray = [...messages];
-      setMessages(newArray);
-      // console.log(newArray.length);
+      setMessages((prev) => {
+        // spread to flag a re-render
+        const newArray = [...prev];
+        newArray.push(message);
+        return newArray;
+      });
     };
 
     const onDeleteMessage = (key) => {
@@ -41,11 +41,15 @@ function useMessages() {
 
       // don't need to update message content
       if (index > -1) {
-        // mutate message directly in case multiple calls are made
-        messages[index].deleted = true;
-        // spread to flag a re-render
-        const newArray = [...messages];
-        setMessages(newArray);
+        setMessages((prev) => {
+          // spread to flag a re-render
+          const newArray = [...prev];
+          const newMessage = { ...prev[index] };
+          newMessage.deleted = true;
+          newArray[index] = newMessage;
+
+          return newArray;
+        });
       }
     };
     const onChangeMessage = () => {};
