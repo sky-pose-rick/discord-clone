@@ -2,15 +2,17 @@ import React from 'react';
 import {
   render, screen, fireEvent, within,
 } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { act } from 'react-dom/test-utils';
 import FirestoreUser from '../logic/FirestoreUser';
 import Home from './Home';
 
 function renderWithRouter() {
   render(
-    <MemoryRouter>
-      <Home />
+    <MemoryRouter initialEntries={['/discord-clone/server/server-1/channel-1']}>
+      <Routes>
+        <Route path="/discord-clone/server/:serverKey/:channelKey" element={<Home />} />
+      </Routes>
     </MemoryRouter>,
   );
 }
@@ -79,7 +81,38 @@ describe('Basic actions', () => {
     expect(channelList.length).toBe(5);
   });
 
-  it.todo('Correct channel is "active"');
+  it('Correct channel is "active"', () => {
+    renderWithRouter();
+    setDummyData();
+
+    const firstChannelNav = screen.getAllByRole('navigation')[1];
+    const firstActiveChannel = within(firstChannelNav).getByRole('link', { current: true });
+    expect(firstActiveChannel.href).toMatch(/channel-1/i);
+
+    const secondChannel = within(firstChannelNav).getAllByRole('link')[1];
+    fireEvent.click(secondChannel);
+
+    const secondChannelNav = screen.getAllByRole('navigation')[1];
+    const secondActiveChannel = within(secondChannelNav).getByRole('link', { current: true });
+    expect(secondActiveChannel.href).toMatch(/channel-2/i);
+  });
+
+  it('Correct server is "active"', () => {
+    renderWithRouter();
+    setDummyData();
+
+    const firstServerNav = screen.getAllByRole('navigation')[0];
+    const firstActiveServer = within(firstServerNav).getByRole('link', { current: true });
+    expect(firstActiveServer.href).toMatch(/server-1/i);
+
+    const secondServer = within(firstServerNav).getAllByRole('link')[1];
+    fireEvent.click(secondServer);
+
+    const secondServerNav = screen.getAllByRole('navigation')[0];
+    const secondActiveServer = within(secondServerNav).getByRole('link', { current: true });
+    expect(secondActiveServer.href).toMatch(/server-2/i);
+  });
+
   it.todo('Can display line breaks within a single message');
   it.todo('Scroll up to fetch more messages');
   it.todo('Display a message when the top of channel is reached');

@@ -132,12 +132,17 @@ function Home() {
         <ServerIcon serverName="Home" src="gone" alt="@me" />
         <div className="line" />
         {servers.map((server) => (
-          <ServerIcon
+          <Link
+            to={`/discord-clone/server/${server.serverKey}/fake-channel`}
+            aria-current={server.serverKey === serverKey ? 'true' : 'false'}
             key={server.serverKey}
-            serverName={server.serverName}
-            src={server.iconURL}
-            alt={server.altText}
-          />
+          >
+            <ServerIcon
+              serverName={server.serverName}
+              src={server.iconURL}
+              alt={server.altText}
+            />
+          </Link>
         ))}
         <ServerIcon serverName="New Server" src="gone" alt="create" />
         <ServerIcon serverName="Find Server" src="gone" alt="browse" />
@@ -152,7 +157,11 @@ function Home() {
       </HeaderBar>
       <ChannelNav>
         {channels.map((channel) => (
-          <Link to={`/discord-clone/server/server-1/${channel.channelKey}`} key={channel.channelKey}>
+          <Link
+            to={`/discord-clone/server/server-1/${channel.channelKey}`}
+            key={channel.channelKey}
+            aria-current={channel.channelKey === channelKey ? 'true' : 'false'}
+          >
             <Channel>
               <span className="symbolled">{channel.channelName}</span>
             </Channel>
