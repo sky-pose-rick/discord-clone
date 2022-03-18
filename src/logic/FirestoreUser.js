@@ -108,6 +108,12 @@ function pushTestContent() {
       makeMessage('User1', '1:01pm', 'Me again', 'id2'),
       makeMessage('User2', '1:02pm', 'Replying', 'id3'),
       makeMessage('User1', '1:03pm', 'Final\nMessage\nWith\nMultiple\nLines\n', 'id4'),
+      makeMessage('User1', '1:03pm', 'a\nb\nc\nd\ne\nf\ng\nh\ni\nj\n', 'id5'),
+      makeMessage('User3', '1:04pm', 'more', 'id6'),
+      makeMessage('User3', '1:04pm', 'more', 'id7'),
+      makeMessage('User3', '1:04pm', 'more', 'id8'),
+      makeMessage('User3', '1:04pm', 'more', 'id9'),
+      makeMessage('User3', '1:04pm', 'more', 'id10'),
     ];
 
     messages.forEach((message) => {

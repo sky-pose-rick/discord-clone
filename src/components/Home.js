@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+// import styled from 'styled-components';
+import { number } from 'prop-types';
 import ServerIcon from './ServerIcon';
 import Message from './Message';
 import FirestoreUser from '../logic/FirestoreUser';
@@ -120,6 +121,33 @@ function textSubmit(e) {
   }
 }
 
+function useMouseWheel() {
+  const [highestY, setHighestY] = useState(Number.MAX_VALUE);
+  const [ticking, setTicking] = useState(false);
+
+  const onWheel = (e) => {
+    if (!ticking) {
+      // const { scrollHeight, scrollTop, scrollTopMax } = e.target;
+      // console.log(e.target);
+      // console.log('Height:', scrollHeight, 'Top:', scrollTop, 'Max', scrollTopMax);
+      const { scrollTop } = e.target;
+      if (scrollTop < highestY) {
+        console.log('new highest scroll:', scrollTop);
+        setHighestY(scrollTop);
+
+        // TODO: try to get new content
+      }
+
+      setTicking(true);
+      setTimeout(() => {
+        setTicking(false);
+      }, 250);
+    }
+  };
+
+  return onWheel;
+}
+
 function Home() {
   const params = useParams();
   const { serverKey, channelKey } = params;
@@ -128,7 +156,8 @@ function Home() {
   const channels = useChannels(serverKey);
   const messages = useMessages(serverKey, channelKey);
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
+  const onContentScroll = useMouseWheel();
   // console.log('render: ', messages);
 
   return (
@@ -176,7 +205,7 @@ function Home() {
       <UserPanel>
         User
       </UserPanel>
-      <MainContent>
+      <MainContent onWheel={onContentScroll}>
         {
           messages.map((message, index) => (
             <Message

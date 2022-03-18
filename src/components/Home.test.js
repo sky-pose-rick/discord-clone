@@ -52,21 +52,23 @@ describe('Basic actions', () => {
     renderWithRouter();
     setDummyData();
 
+    const testMessageCount = 10;
+
     const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: '\n' } });
     fireEvent.keyUp(input, { code: 'Enter' });
 
     expect(input.value).toEqual('');
     const main = screen.getByRole('main');
-    expect(main.children.length).toBe(4);
+    expect(main.children.length).toBe(testMessageCount);
 
     fireEvent.change(input, { target: { value: '\n\n' } });
     fireEvent.keyUp(input, { code: 'Enter' });
-    expect(main.children.length).toBe(4);
+    expect(main.children.length).toBe(testMessageCount);
 
     fireEvent.change(input, { target: { value: '   \n' } });
     fireEvent.keyUp(input, { code: 'Enter' });
-    expect(main.children.length).toBe(4);
+    expect(main.children.length).toBe(testMessageCount);
   });
 
   // it.todo('Message can appear from another source');
