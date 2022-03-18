@@ -156,7 +156,7 @@ const InputBox = styled.div`{
   display: flex;
   align-items: center;
 
-  input{
+  textarea{
     width: 100%;
     margin: 0px 20px;
     height: 3em;

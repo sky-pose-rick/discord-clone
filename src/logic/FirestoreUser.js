@@ -99,8 +99,8 @@ function pushTestContent() {
   }
 
   if (messageSubscriber) {
-    const makeMessage = (user, timestamp, content, key) => ({
-      user, timestamp, content, key,
+    const makeMessage = (user, timestamp, content, messageKey) => ({
+      user, timestamp, content, messageKey,
     });
 
     const messages = [

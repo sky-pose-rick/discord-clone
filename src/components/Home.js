@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 // import styled from 'styled-components';
-import { number } from 'prop-types';
 import ServerIcon from './ServerIcon';
 import Message from './Message';
 import FirestoreUser from '../logic/FirestoreUser';
@@ -207,13 +206,13 @@ function Home() {
       </UserPanel>
       <MainContent onWheel={onContentScroll}>
         {
-          messages.map((message, index) => (
+          messages.map((message) => (
             <Message
               user={message.user}
               timestamp={message.timestamp}
               content={message.content}
               deleted={message.deleted}
-              key={`message-${index}`}
+              key={message.messageKey}
             />
           ))
         }
