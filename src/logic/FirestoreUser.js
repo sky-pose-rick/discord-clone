@@ -1,6 +1,12 @@
+import fakeStorage from './fakeStorage';
+
 let messageSubscriber = null;
 let serverSubscriber = null;
 let channelSubscriber = null;
+let activeChannelKey = null;
+let activeServerKey = null;
+let messageCount = 0;
+const messagesToFetch = 12;
 
 function displayMessage(message) {
   if (!messageSubscriber) {
@@ -31,14 +37,26 @@ function deleteMessage(key) {
 function unSubscribeToMessages() {
   // should stop listening to firestore snapshots here
 
+  activeChannelKey = null;
+  messageCount = 0;
   messageSubscriber = null;
   // console.log('Unsubscribed to messages');
 }
 
-function subscribeToMessages(onNewMessage, onChangeMessage, onDeleteMessage) {
+function subscribeToMessages(
+  channelKey,
+  onNewMessage,
+  onChangeMessage,
+  onDeleteMessage,
+  onClearMessages,
+) {
   // should start listening to firestore snapshots here
 
-  messageSubscriber = { onNewMessage, onChangeMessage, onDeleteMessage };
+  onClearMessages();
+  activeChannelKey = channelKey;
+  messageSubscriber = {
+    onNewMessage, onChangeMessage, onDeleteMessage, onClearMessages,
+  };
   // console.log('Got a subscription to messages');
 }
 
@@ -57,12 +75,14 @@ function unSubscribeToServers() {
 function subscribeToChannels(serverKey, onReplaceChannelList) {
   // should make some connection to firestore here
 
+  activeServerKey = serverKey;
   channelSubscriber = { onReplaceChannelList };
 }
 
 function unSubscribeToChannels() {
   // should stop listening to firestore snapshots here
 
+  activeServerKey = null;
   channelSubscriber = null;
 }
 
@@ -122,6 +142,37 @@ function pushTestContent() {
   }
 }
 
+function pushFakeContent() {
+  if (serverSubscriber) {
+    serverSubscriber.onReplaceServerList(fakeStorage.getServers());
+  }
+
+  if (activeServerKey) {
+    if (channelSubscriber) {
+      channelSubscriber.onReplaceChannelList(fakeStorage.getChannels(activeServerKey));
+    }
+    // console.log('valid server is active');
+
+    if (messageSubscriber && activeChannelKey) {
+      // console.log('valid channel is active');
+      const messages = fakeStorage.getMessages(
+        activeServerKey,
+        activeChannelKey,
+        messageCount,
+        messagesToFetch,
+      );
+
+      // console.log(messages);
+
+      messages.forEach((message) => {
+        displayMessage(message);
+      });
+
+      messageCount += messages.length;
+    }
+  }
+}
+
 export default {
   sendMessage,
   deleteMessage,
@@ -132,4 +183,5 @@ export default {
   subscribeToServers,
   unSubscribeToServers,
   pushTestContent,
+  pushFakeContent,
 };

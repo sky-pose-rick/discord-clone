@@ -20,7 +20,7 @@ function renderWithRouter() {
 }
 
 function setDummyData() {
-  act(() => { FirestoreUser.pushTestContent(); });
+  act(() => { FirestoreUser.pushFakeContent(); });
 }
 
 it('Server renders', () => {
@@ -76,7 +76,7 @@ describe('Basic actions', () => {
     renderWithRouter();
     setDummyData();
 
-    act(() => { FirestoreUser.deleteMessage('id2'); });
+    act(() => { FirestoreUser.deleteMessage('id5'); });
 
     screen.getByText(/<deleted>/i);
   });
@@ -90,7 +90,7 @@ describe('Basic actions', () => {
     // console.log(navs);
     const channelList = within(navs[1]).getAllByRole('link');
     // dummy data has 5 channels
-    expect(channelList.length).toBe(5);
+    expect(channelList.length).toBe(2);
   });
 
   it('Correct channel is "active"', () => {
@@ -131,7 +131,7 @@ describe('Basic actions', () => {
 
     const input = screen.getByRole('textbox');
     const multiLineString = 'My\nmulti\nline\nRomeo.';
-    console.log(multiLineString);
+    // console.log(multiLineString);
     fireEvent.change(input, { target: { value: multiLineString } });
     fireEvent.keyUp(input, { code: 'Enter' });
     const messageElem = screen.getByText(/romeo/i);

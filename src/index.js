@@ -13,5 +13,12 @@ ReactDOM.render(
 
 setTimeout(() => {
   console.log('Index tried to push content after 0.75s');
-  FirestoreUser.pushTestContent();
+  FirestoreUser.pushFakeContent();
 }, 750);
+
+document.addEventListener('keyup', (e) => {
+  if (e.code === 'Numpad7') {
+    console.log('Num 7');
+    FirestoreUser.pushFakeContent();
+  }
+});

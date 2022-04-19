@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  MemoryRouter,
+  BrowserRouter,
   Route, Routes,
 } from 'react-router-dom';
 import Fallback from './components/Fallback';
@@ -9,7 +9,7 @@ import Home from './components/Home';
 
 function App() {
   return (
-    <MemoryRouter>
+    <BrowserRouter>
       <Routes>
         {/* <Route path="/discord-clone" element={<Home />} /> */}
         <Route path="/discord-clone/register" element={<LoginRegister register />} />
@@ -22,7 +22,7 @@ function App() {
         <Route path="/discord-clone/discovery" element={<Home />} />
         <Route path="*" element={<Fallback />} />
       </Routes>
-    </MemoryRouter>
+    </BrowserRouter>
   );
 }
 

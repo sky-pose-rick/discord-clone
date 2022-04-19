@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 // import styled from 'styled-components';
+import uniqid from 'uniqid';
 import ServerIcon from './ServerIcon';
 import Message from './Message';
 import FirestoreUser from '../logic/FirestoreUser';
@@ -19,7 +20,7 @@ const {
   UserList,
 } = ServerStyles;
 
-function useMessages() {
+function useMessages(channelKey) {
   const [messages, setMessages] = useState([]);
 
   // useEffect needs to be called when state changes in order to update callback
@@ -37,29 +38,36 @@ function useMessages() {
     };
 
     const onDeleteMessage = (key) => {
-      const index = messages.findIndex((message) => key === message.key);
-
       // don't need to update message content
-      if (index > -1) {
-        setMessages((prev) => {
+      setMessages((prev) => {
+        const index = prev.findIndex((message) => key === message.messageKey);
+        if (index > -1) {
           // spread to flag a re-render
           const newArray = [...prev];
           const newMessage = { ...prev[index] };
           newMessage.deleted = true;
           newArray[index] = newMessage;
-
           return newArray;
-        });
-      }
+        }
+        // if message is not found, make no changes
+        return prev;
+      });
     };
     const onChangeMessage = () => {};
+    const onClearMessages = () => { setMessages([]); };
 
-    FirestoreUser.subscribeToMessages(onNewMessage, onChangeMessage, onDeleteMessage);
+    FirestoreUser.subscribeToMessages(
+      channelKey,
+      onNewMessage,
+      onChangeMessage,
+      onDeleteMessage,
+      onClearMessages,
+    );
 
     return () => {
       FirestoreUser.unSubscribeToMessages();
     };
-  }, [messages]);
+  }, [channelKey]);
 
   return messages;
 }
@@ -97,7 +105,7 @@ function useChannels(serverKey) {
     return () => {
       FirestoreUser.unSubscribeToChannels();
     };
-  }, [channels]);
+  }, [serverKey]);
 
   return channels;
 }
@@ -111,6 +119,7 @@ function textSubmit(e) {
       content: textContent,
       timestamp: 'Now',
       user: 'Third User',
+      messageKey: uniqid(),
     });
     e.target.value = '';
     e.stopPropagation();
@@ -153,7 +162,7 @@ function Home() {
 
   const servers = useServers();
   const channels = useChannels(serverKey);
-  const messages = useMessages(serverKey, channelKey);
+  const messages = useMessages(channelKey);
 
   // const navigate = useNavigate();
   const onContentScroll = useMouseWheel();
@@ -191,7 +200,7 @@ function Home() {
       <ChannelNav>
         {channels.map((channel) => (
           <Link
-            to={`/discord-clone/server/server-1/${channel.channelKey}`}
+            to={`/discord-clone/server/${serverKey}/${channel.channelKey}`}
             key={channel.channelKey}
             aria-current={channel.channelKey === channelKey ? 'true' : 'false'}
           >
