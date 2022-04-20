@@ -16,9 +16,23 @@ setTimeout(() => {
   FirestoreUser.pushFakeContent();
 }, 750);
 
+let counter = 0;
+
 document.addEventListener('keyup', (e) => {
   if (e.code === 'Numpad7') {
     console.log('Num 7');
     FirestoreUser.pushFakeContent();
+  }
+
+  if (e.code === 'Numpad8') {
+    console.log('Num 8');
+    counter += 1;
+    // console.log(textContent);
+    FirestoreUser.sendMessage({
+      content: `Sample Message #${counter}`,
+      timestamp: 'Now',
+      user: 'Third User',
+      messageKey: `genned-message-${counter}`,
+    });
   }
 });

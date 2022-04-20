@@ -8,7 +8,7 @@ let activeServerKey = null;
 let messageCount = 0;
 const messagesToFetch = 12;
 
-function displayMessage(message) {
+function displayMessage(message, appendToStart) {
   if (!messageSubscriber) {
     console.error('Missing message subscriber');
     return;
@@ -17,8 +17,26 @@ function displayMessage(message) {
     console.error('Blank message submitted');
     return;
   }
-  messageSubscriber.onNewMessage(message);
+  messageSubscriber.onNewMessage(message, appendToStart);
   // console.log('sent:', message);
+}
+
+function loadMoreMessages() {
+  if (messageSubscriber && activeChannelKey) {
+    // console.log('valid channel is active');
+    const messages = fakeStorage.getMessages(
+      activeServerKey,
+      activeChannelKey,
+      messageCount,
+      messagesToFetch,
+    );
+
+    messages.reverse().forEach((message) => {
+      displayMessage(message, true);
+    });
+
+    messageCount += messages.length;
+  }
 }
 
 function sendMessage(message) {
@@ -184,4 +202,5 @@ export default {
   unSubscribeToServers,
   pushTestContent,
   pushFakeContent,
+  loadMoreMessages,
 };

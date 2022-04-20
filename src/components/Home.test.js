@@ -17,6 +17,9 @@ function renderWithRouter() {
       </Routes>
     </MemoryRouter>,
   );
+
+  // need to mock the scroll function
+  window.HTMLElement.prototype.scroll = jest.fn(() => {});
 }
 
 function setDummyData() {
@@ -137,7 +140,24 @@ describe('Basic actions', () => {
     const messageElem = screen.getByText(/romeo/i);
     expect(messageElem.previousSibling.innerHTML).toMatch('line');
   });
-  it.todo('Scroll up to fetch more messages');
+  it('Scroll up to fetch more messages', () => {
+    render(
+      <MemoryRouter initialEntries={['/discord-clone/server/server-2/channel-3']}>
+        <Routes>
+          <Route path="/discord-clone/server/:serverKey/:channelKey" element={<Home />} />
+          <Route path="/discord-clone/server/:serverKey" element={<Home />} />
+          <Route path="/discord-clone/server" element={<Home />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    setDummyData();
+
+    const fullMessageCount = 20;
+
+    const main = screen.getByRole('main');
+    fireEvent.wheel(main, { target: { scrollTop: 0 } });
+    expect(main.children.length).toBe(fullMessageCount);
+  });
   it.todo('Display a message when the top of channel is reached');
 });
 

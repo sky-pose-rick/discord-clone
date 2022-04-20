@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 // import styled from 'styled-components';
 import uniqid from 'uniqid';
@@ -20,21 +20,30 @@ const {
   UserList,
 } = ServerStyles;
 
-function useMessages(channelKey) {
+function useMessages(channelKey, mainRef) {
   const [messages, setMessages] = useState([]);
 
   // useEffect needs to be called when state changes in order to update callback
   useEffect(() => {
-    const onNewMessage = (message) => {
-      // console.log('old messages:', messages);
-      // console.log('onNewMessage:', message);
+    const onNewMessage = (message, appendToStart) => {
+      const main = mainRef.current;
+      const willScroll = main.scrollHeight - main.scrollTop - main.clientHeight < 60;
 
       setMessages((prev) => {
         // spread to flag a re-render
         const newArray = [...prev];
-        newArray.push(message);
+        if (appendToStart) {
+          newArray.unshift(message);
+        } else {
+          newArray.push(message);
+        }
         return newArray;
       });
+
+      // scroll to bottom
+      if (willScroll && !appendToStart) {
+        main.scroll({ top: main.scrollHeight, behavior: 'instant' });
+      }
     };
 
     const onDeleteMessage = (key) => {
@@ -129,21 +138,20 @@ function textSubmit(e) {
   }
 }
 
-function useMouseWheel() {
-  const [highestY, setHighestY] = useState(Number.MAX_VALUE);
+function useMouseWheel(mainRef) {
   const [ticking, setTicking] = useState(false);
 
-  const onWheel = (e) => {
+  const onWheel = () => {
     if (!ticking) {
-      // const { scrollHeight, scrollTop, scrollTopMax } = e.target;
-      // console.log(e.target);
+      const main = mainRef.current;
+      // const { scrollHeight, scrollTop, scrollTopMax } = main;
       // console.log('Height:', scrollHeight, 'Top:', scrollTop, 'Max', scrollTopMax);
-      const { scrollTop } = e.target;
-      if (scrollTop < highestY) {
-        console.log('new highest scroll:', scrollTop);
-        setHighestY(scrollTop);
+      const { scrollTop } = main;
+      if (scrollTop < 25) {
+        // console.log('new highest scroll:', scrollTop);
 
         // TODO: try to get new content
+        FirestoreUser.loadMoreMessages();
       }
 
       setTicking(true);
@@ -159,13 +167,14 @@ function useMouseWheel() {
 function Home() {
   const params = useParams();
   const { serverKey, channelKey } = params;
+  const mainRef = useRef();
 
   const servers = useServers();
   const channels = useChannels(serverKey);
-  const messages = useMessages(channelKey);
+  const messages = useMessages(channelKey, mainRef);
 
   // const navigate = useNavigate();
-  const onContentScroll = useMouseWheel();
+  const onContentScroll = useMouseWheel(mainRef);
   // console.log('render: ', messages);
 
   return (
@@ -213,7 +222,7 @@ function Home() {
       <UserPanel>
         User
       </UserPanel>
-      <MainContent onWheel={onContentScroll}>
+      <MainContent onWheelCapture={onContentScroll} ref={mainRef}>
         {
           messages.map((message) => (
             <Message
