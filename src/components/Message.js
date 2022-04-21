@@ -45,41 +45,52 @@ const MessageHeader = styled.div`{
 
 function Message(props) {
   const {
-    user, timestamp, content, deleted,
+    user, timestamp, content, deleted, isRoot,
   } = props;
 
   const linedContent = content.split('\n');
 
   // TODO: remove username and image for consecutive messages
   return (
-    <MessageBox>
-      <ImageWrapper>
-        <div />
-      </ImageWrapper>
-      <MessageHeader>
-        <span>{user}</span>
-        <span>{timestamp}</span>
-      </MessageHeader>
-      <div>
-        {deleted && <p>{'<deleted>'}</p>}
-        {!deleted
-          // eslint-disable-next-line react/no-array-index-key
-          && linedContent.map((segment, index) => (<p key={index}>{segment}</p>))}
-      </div>
-    </MessageBox>
+    <div>
+      {isRoot
+        && <div>{content}</div>}
+      {!isRoot
+        && (
+        <MessageBox>
+          <ImageWrapper>
+            <div />
+          </ImageWrapper>
+          <MessageHeader>
+            <span>{user}</span>
+            <span>{timestamp}</span>
+          </MessageHeader>
+          <div>
+            {deleted && <p>{'<deleted>'}</p>}
+            {!deleted
+              // eslint-disable-next-line react/no-array-index-key
+              && linedContent.map((segment, index) => (<p key={index}>{segment}</p>))}
+          </div>
+        </MessageBox>
+        )}
+    </div>
   );
 }
 
 Message.propTypes = {
-  user: propTypes.string.isRequired,
-  timestamp: propTypes.string.isRequired,
+  user: propTypes.string,
+  timestamp: propTypes.string,
   content: propTypes.string,
   deleted: propTypes.bool,
+  isRoot: propTypes.bool,
 };
 
 Message.defaultProps = {
+  user: 'missing',
+  timestamp: 'missing',
   content: 'missing',
   deleted: false,
+  isRoot: false,
 };
 
 export default Message;

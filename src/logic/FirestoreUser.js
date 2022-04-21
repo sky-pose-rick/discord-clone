@@ -6,6 +6,7 @@ let channelSubscriber = null;
 let activeChannelKey = null;
 let activeServerKey = null;
 let messageCount = 0;
+let rootShown = false;
 const messagesToFetch = 12;
 
 function displayMessage(message, appendToStart) {
@@ -36,6 +37,16 @@ function loadMoreMessages() {
     });
 
     messageCount += messages.length;
+
+    if (messages.length < messagesToFetch && !rootShown) {
+      const rootMessage = fakeStorage.getChannelRoot(activeServerKey, activeChannelKey);
+      displayMessage({
+        content: rootMessage,
+        messageKey: `${activeChannelKey}-root`,
+        isRoot: true,
+      }, true);
+      rootShown = true;
+    }
   }
 }
 
@@ -72,6 +83,7 @@ function subscribeToMessages(
 
   onClearMessages();
   activeChannelKey = channelKey;
+  rootShown = false;
   messageSubscriber = {
     onNewMessage, onChangeMessage, onDeleteMessage, onClearMessages,
   };

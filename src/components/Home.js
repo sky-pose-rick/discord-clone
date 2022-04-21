@@ -231,6 +231,7 @@ function Home() {
               content={message.content}
               deleted={message.deleted}
               key={message.messageKey}
+              isRoot={message.isRoot}
             />
           ))
         }

@@ -156,9 +156,24 @@ describe('Basic actions', () => {
 
     const main = screen.getByRole('main');
     fireEvent.wheel(main, { target: { scrollTop: 0 } });
-    expect(main.children.length).toBe(fullMessageCount);
+    expect(main.children.length).toBe(fullMessageCount + 1);
   });
-  it.todo('Display a message when the top of channel is reached');
+  it('Display a message when the top of channel is reached', () => {
+    render(
+      <MemoryRouter initialEntries={['/discord-clone/server/server-2/channel-3']}>
+        <Routes>
+          <Route path="/discord-clone/server/:serverKey/:channelKey" element={<Home />} />
+          <Route path="/discord-clone/server/:serverKey" element={<Home />} />
+          <Route path="/discord-clone/server" element={<Home />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    setDummyData();
+
+    const main = screen.getByRole('main');
+    fireEvent.wheel(main, { target: { scrollTop: 0 } });
+    screen.getByText(/the cool root/i);
+  });
 });
 
 // actions that require authentication

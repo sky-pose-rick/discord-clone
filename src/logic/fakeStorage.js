@@ -2,8 +2,8 @@ const makeServer = (serverKey, serverName, iconURL, altText) => ({
   serverKey, serverName, iconURL, altText, channels: {}, users: {},
 });
 
-const makeChannel = (channelKey, channelName, channelDesc) => ({
-  channelKey, channelName, channelDesc, messages: [],
+const makeChannel = (channelKey, channelName, channelDesc, channelRoot) => ({
+  channelKey, channelName, channelDesc, channelRoot, messages: [],
 });
 
 const makeMessage = (user, timestamp, content, messageKey) => ({
@@ -18,7 +18,7 @@ const data = (() => {
   const server1 = makeServer('server-1', 'Server1', '/discord-clone/img/profile2.png', 'SV1');
   server1.users['user-1'] = makeUser('user-1', 'User 1', '/discord-clone/img/profile2.png');
   server1.users['user-2'] = makeUser('user-2', 'User 2', 'gone');
-  const channel11 = makeChannel('channel-1', 'Channel-1', 'Speak your Piece.');
+  const channel11 = makeChannel('channel-1', 'Channel-1', 'Speak your Piece.', 'The root of channel 1');
   channel11.messages = [
     makeMessage('User1', '1:00pm', 'Hello World!', 'id1'),
     makeMessage('User1', '1:01pm', 'Me again', 'id2'),
@@ -31,7 +31,7 @@ const data = (() => {
     makeMessage('User3', '1:04pm', 'more', 'id9'),
     makeMessage('User3', '1:04pm', 'more', 'id10'),
   ];
-  const channel12 = makeChannel('channel-2', 'Channel-2', 'The alt channel.');
+  const channel12 = makeChannel('channel-2', 'Channel-2', 'The alt channel.', 'The root of channel 2');
   channel12.messages = [
     makeMessage('User1', '1:00pm', 'Change the channel!', 'id11'),
   ];
@@ -39,7 +39,7 @@ const data = (() => {
 
   const server2 = makeServer('server-2', 'Server2', 'gone', 'SV2');
   server2.users['user-3'] = makeUser('user-3', 'User 3', 'gone');
-  const channel21 = makeChannel('channel-3', 'Cool Zone', 'Coolest place on the coolest server.');
+  const channel21 = makeChannel('channel-3', 'Cool Zone', 'Coolest place on the coolest server.', 'The Cool Root');
   channel21.messages = [
     makeMessage('User1', '1:00pm', 'Hello World!', 'id101'),
     makeMessage('User1', '1:01pm', 'Me again', 'id102'),
@@ -123,6 +123,17 @@ function getMessages(serverKey, channelKey, startingOffset = 0, messageCount = 1
   return [];
 }
 
+function getChannelRoot(serverKey, channelKey) {
+  const server = data[serverKey];
+  if (server) {
+    const channel = server.channels[channelKey];
+    if (channel) {
+      return channel.channelRoot;
+    }
+  }
+  return 'missing root';
+}
+
 export default {
-  getServers, getChannels, addMessage, getMessages,
+  getServers, getChannels, addMessage, getMessages, getChannelRoot,
 };
