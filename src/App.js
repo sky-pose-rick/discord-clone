@@ -5,7 +5,7 @@ import {
 } from 'react-router-dom';
 import Fallback from './components/Fallback';
 import LoginRegister from './components/Frontpage';
-import Home from './components/Home';
+import VerifyLogin from './components/VerifyLogin';
 
 function App() {
   return (
@@ -14,12 +14,12 @@ function App() {
         {/* <Route path="/discord-clone" element={<Home />} /> */}
         <Route path="/discord-clone/register" element={<LoginRegister register />} />
         <Route path="/discord-clone/login" element={<LoginRegister register={false} />} />
-        <Route path="/discord-clone/@me/:chatKey" element={<Home />} />
-        <Route path="/discord-clone/@me" element={<Home />} />
-        <Route path="/discord-clone/server/:serverKey/:channelKey" element={<Home />} />
-        <Route path="/discord-clone/server/:serverKey" element={<Home />} />
-        <Route path="/discord-clone/server" element={<Home />} />
-        <Route path="/discord-clone/discovery" element={<Home />} />
+        <Route path="/discord-clone/@me/:chatKey" element={<VerifyLogin />} />
+        <Route path="/discord-clone/@me" element={<VerifyLogin />} />
+        <Route path="/discord-clone/server/:serverKey/:channelKey" element={<VerifyLogin />} />
+        <Route path="/discord-clone/server/:serverKey" element={<VerifyLogin />} />
+        <Route path="/discord-clone/server" element={<VerifyLogin />} />
+        <Route path="/discord-clone/discovery" element={<VerifyLogin />} />
         <Route path="*" element={<Fallback />} />
       </Routes>
     </BrowserRouter>

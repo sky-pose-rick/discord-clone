@@ -1,39 +1,20 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
-import styled from 'styled-components';
+import RegisterStyles from '../component-styles/RegisterStyles';
 
-const FormBox = styled.div`{
-  background-color: #363940;
-  color: #9c9fa6;
-  margin: 20px 20px;
-  padding: 10px 40px;
-  width: 400px;
-}`;
-
-const FormH1 = styled.h1`{
-  color: white;
-}`;
-
-const LabelWrapper = styled.div`{
-  display: flex;
-  flex-direction: column;
-  margin: 5px;
-  gap: 5px;
-}`;
-
-const InputWrapper = styled.div`{
-  display: flex;
-}`;
-
-const FormInput = styled.input`{
-  width: 100%;
-}`;
+const {
+  FormBox,
+  FormH1,
+  LabelWrapper,
+  InputWrapper,
+  FormInput,
+} = RegisterStyles;
 
 function Register() {
   return (
     <FormBox>
       <FormH1>Create an account</FormH1>
-      <form action="" method="POST">
+      <form action="">
         <LabelWrapper>
           <label htmlFor="register-email">EMAIL</label>
           <InputWrapper><FormInput name="email" id="register-email" type="email" required /></InputWrapper>

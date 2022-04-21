@@ -11,10 +11,10 @@ ReactDOM.render(
   document.getElementById('root'),
 );
 
-setTimeout(() => {
+/* setTimeout(() => {
   console.log('Index tried to push content after 0.75s');
   FirestoreUser.pushFakeContent();
-}, 750);
+}, 750); */
 
 let counter = 0;
 

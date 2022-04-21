@@ -5,6 +5,7 @@ import uniqid from 'uniqid';
 import ServerIcon from './ServerIcon';
 import Message from './Message';
 import FirestoreUser from '../logic/FirestoreUser';
+import FirebaseAuthUser from '../logic/FirebaseAuthUser';
 
 import ServerStyles from '../component-styles/ServerStyles';
 
@@ -123,11 +124,12 @@ function textSubmit(e) {
   // console.log(e);
   const textContent = e.target.value.trim();
   if (e.code === 'Enter' && textContent) {
+    const user = FirebaseAuthUser.getUser();
     // console.log(textContent);
     FirestoreUser.sendMessage({
       content: textContent,
       timestamp: 'Now',
-      user: 'Third User',
+      user: user.username,
       messageKey: uniqid(),
     });
     e.target.value = '';

@@ -6,6 +6,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { act } from 'react-dom/test-utils';
 import FirestoreUser from '../logic/FirestoreUser';
 import Home from './Home';
+import FirebaseAuthUser from '../logic/FirebaseAuthUser';
 
 function renderWithRouter() {
   render(
@@ -23,6 +24,7 @@ function renderWithRouter() {
 }
 
 function setDummyData() {
+  FirebaseAuthUser.signIn();
   act(() => { FirestoreUser.pushFakeContent(); });
 }
 
