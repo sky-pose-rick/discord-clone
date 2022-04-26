@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import propTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -36,35 +36,39 @@ const ModalBox = styled.div`
   }
 `;
 
-function makeInput(input, key) {
+function makeInput(input, index, onInputChange, inputValues) {
   const { type, label, placeholder } = input;
-  const id = `modal-${key}`;
+  const id = `modal-${index}`;
+  const onChange = (e) => {
+    onInputChange(index, e.target.value);
+  };
+
   switch (type) {
     case 'label':
-      return (<div key={key}>{label}</div>);
+      return (<div key={index}>{label}</div>);
     case 'text':
       return (
-        <div key={key}>
+        <div key={index}>
           <label htmlFor={id}>{label}</label>
-          <input type="text" defaultValue={placeholder} id={id} />
+          <input type="text" value={inputValues[index]} onChange={onChange} id={id} />
         </div>
       );
     case 'textarea':
       return (
-        <div key={key}>
+        <div key={index}>
           <label htmlFor={id}>{label}</label>
-          <textarea defaultValue={placeholder} id={id} />
+          <textarea value={inputValues[index]} onChange={onChange} id={id} />
         </div>
       );
     case 'file':
       return (
-        <div key={key}>
+        <div key={index}>
           <label htmlFor={id}>{label}</label>
-          <input type="file" defaultValue={placeholder} id={id} />
+          <input type="file" value={inputValues[index]} onChange={onChange} id={id} />
         </div>
       );
     default:
-      return (<div key={key}>{`${type}: ${label}: ${placeholder}`}</div>);
+      return (<div key={index}>{`${type}: ${label}: ${placeholder}`}</div>);
   }
 }
 
@@ -73,11 +77,26 @@ function ModalWindow(props) {
     inputs, submitLabel, onSubmit, onClose,
   } = props;
 
+  const [inputValues, setInputValues] = useState(inputs.map((input) => input.placeholder));
+
+  const submitFunc = (e) => {
+    e.preventDefault();
+    onSubmit(inputValues);
+  };
+
+  const onInputChange = (index, value) => {
+    setInputValues((prev) => {
+      const newArray = [...prev];
+      newArray[index] = value;
+      return newArray;
+    });
+  };
+
   return (
     <ModalBackground>
       <ModalBox>
-        {inputs.map((input, index) => makeInput(input, index))}
-        <button type="submit" onClick={onSubmit}>{submitLabel}</button>
+        {inputs.map((input, index) => makeInput(input, index, onInputChange, inputValues))}
+        <button type="submit" onClick={submitFunc}>{submitLabel}</button>
         <button type="button" onClick={onClose}>Cancel</button>
       </ModalBox>
     </ModalBackground>

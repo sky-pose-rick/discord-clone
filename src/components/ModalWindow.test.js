@@ -31,13 +31,13 @@ it('Can submit', () => {
     },
   ];
 
-  const onSumbit = jest.fn();
+  const onSubmit = jest.fn();
 
-  renderWindow(inputList, confirm, onSumbit, null);
+  renderWindow(inputList, confirm, onSubmit, null);
 
   const submitButton = screen.getAllByRole('button')[0];
   fireEvent.click(submitButton);
-  expect(onSumbit.mock.calls.length).toBe(1);
+  expect(onSubmit.mock.calls.length).toBe(1);
 });
 
 it('Can cancel a window', () => {
@@ -113,4 +113,36 @@ it('Displays text', () => {
 
   renderWindow(inputList, confirm, null, null);
   screen.getByText(/basic question/i);
+});
+
+it('Get the values that were entered', () => {
+  const inputList = [
+    {
+      type: 'text',
+      label: 'Basic Question?',
+      placeholder: 'my value 1',
+    },
+    {
+      type: 'textarea',
+      label: 'Q2?',
+      placeholder: 'my value 2',
+    },
+    {
+      type: 'label',
+      label: 'Not a question',
+      placeholder: 'my value 3',
+    },
+  ];
+
+  const onSubmit = jest.fn();
+
+  renderWindow(inputList, confirm, onSubmit, null);
+
+  const input = screen.getAllByRole('textbox')[0];
+  fireEvent.change(input, { target: { value: 'My input' } });
+
+  const submitButton = screen.getAllByRole('button')[0];
+  fireEvent.click(submitButton);
+
+  expect(onSubmit.mock.calls[0][0][0]).toMatch('My input');
 });
