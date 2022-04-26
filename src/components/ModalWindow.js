@@ -1,5 +1,40 @@
 import React from 'react';
 import propTypes from 'prop-types';
+import styled from 'styled-components';
+
+const ModalBackground = styled.div`
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 2;
+  display: float;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ModalBox = styled.div`
+  background-color: gray;
+  border: solid 3px #444;
+  padding: 30px;
+
+  >div{
+    padding: 10px 0px;
+  }
+
+  button{
+    padding: 5px;
+    color: white;
+  }
+
+  button[type=button]{
+    background-color: red;
+  }
+
+  button[type=submit]{
+    background-color: green;
+  }
+`;
 
 function makeInput(input, key) {
   const { type, label, placeholder } = input;
@@ -39,11 +74,13 @@ function ModalWindow(props) {
   } = props;
 
   return (
-    <div className="ModalWindow">
-      {inputs.map((input, index) => makeInput(input, index))}
-      <button type="submit" onClick={onSubmit}>{submitLabel}</button>
-      <button type="button" onClick={onClose}>Cancel</button>
-    </div>
+    <ModalBackground>
+      <ModalBox>
+        {inputs.map((input, index) => makeInput(input, index))}
+        <button type="submit" onClick={onSubmit}>{submitLabel}</button>
+        <button type="button" onClick={onClose}>Cancel</button>
+      </ModalBox>
+    </ModalBackground>
   );
 }
 

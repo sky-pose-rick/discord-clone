@@ -6,6 +6,7 @@ import ServerIcon from './ServerIcon';
 import Message from './Message';
 import FirestoreUser from '../logic/FirestoreUser';
 import FirebaseAuthUser from '../logic/FirebaseAuthUser';
+import modalService from '../logic/modalService';
 
 import ServerStyles from '../component-styles/ServerStyles';
 
@@ -174,6 +175,7 @@ function Home() {
   const servers = useServers();
   const channels = useChannels(serverKey);
   const messages = useMessages(channelKey, mainRef);
+  const createModal = modalService.useModal();
 
   // const navigate = useNavigate();
   const onContentScroll = useMouseWheel(mainRef);
@@ -221,7 +223,16 @@ function Home() {
           </Link>
         ))}
       </ChannelNav>
-      <UserPanel>
+      <UserPanel onClick={() => {
+        createModal([
+          {
+            type: 'label',
+            label: 'Basic Question?',
+            placeholder: 'none',
+          },
+        ], 'Custom Label');
+      }}
+      >
         User
       </UserPanel>
       <MainContent onWheelCapture={onContentScroll} ref={mainRef}>

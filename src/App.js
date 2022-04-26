@@ -6,10 +6,14 @@ import {
 import Fallback from './components/Fallback';
 import LoginRegister from './components/Frontpage';
 import VerifyLogin from './components/VerifyLogin';
+import modalService from './logic/modalService';
 
 function App() {
+  const modalWindow = modalService.getModalWindow();
+
   return (
     <BrowserRouter>
+      {modalWindow}
       <Routes>
         {/* <Route path="/discord-clone" element={<Home />} /> */}
         <Route path="/discord-clone/register" element={<LoginRegister register />} />
