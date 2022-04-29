@@ -177,6 +177,9 @@ function Home() {
   const messages = useMessages(channelKey, mainRef);
   const createModal = modalService.useModal();
 
+  const currentServer = servers.find((server) => server.serverKey === serverKey) || {};
+  const currentChannel = channels.find((channel) => channel.channelKey === channelKey) || {};
+
   // const navigate = useNavigate();
   const onContentScroll = useMouseWheel(mainRef);
   // console.log('render: ', messages);
@@ -199,18 +202,162 @@ function Home() {
             />
           </Link>
         ))}
-        <ServerIcon serverName="New Server" src="gone" alt="create" />
+        { /* eslint-disable-next-line jsx-a11y/click-events-have-key-events */ }
+        <div
+          role="button"
+          tabIndex="0"
+          onClick={() => {
+            createModal([
+              {
+                type: 'label',
+                label: 'Create Server',
+                placeholder: 'none',
+              },
+              {
+                type: 'text',
+                label: 'Name',
+                placeholder: 'new-server',
+              },
+              {
+                type: 'file',
+                label: 'Icon',
+                placeholder: '',
+              },
+            ], 'Create');
+          }}
+        >
+          <ServerIcon
+            serverName="New Server"
+            src="gone"
+            alt="create"
+          />
+        </div>
         <ServerIcon serverName="Find Server" src="gone" alt="browse" />
       </ServerNav>
       <HeaderBar>
-        <div>Server Name</div>
-        <div>
-          <span className="symbolled">My-channel</span>
+        <div className="server-bar">{currentServer.serverName}</div>
+        <div className="channel-bar">
+          <span className="symbolled">{currentChannel.channelName}</span>
           <div className="line" />
-          <span className="channel-desc">Speak your piece</span>
+          <span className="channel-desc">{currentChannel.channelDesc}</span>
+          <button
+            className="edit-server"
+            type="button"
+            onClick={() => {
+              createModal([
+                {
+                  type: 'label',
+                  label: 'Edit Server',
+                  placeholder: 'none',
+                },
+                {
+                  type: 'text',
+                  label: 'Name',
+                  placeholder: currentServer.serverName,
+                },
+                {
+                  type: 'file',
+                  label: 'Icon',
+                  placeholder: '',
+                },
+              ], 'Save');
+            }}
+          >
+            Edit Server
+          </button>
+          <button
+            className="delete-server"
+            type="button"
+            onClick={() => {
+              createModal([
+                {
+                  type: 'label',
+                  label: 'Delete Server?',
+                  placeholder: 'none',
+                },
+              ], 'Confirm');
+            }}
+          >
+            Delete Server
+          </button>
+          <button
+            className="edit-channel"
+            type="button"
+            onClick={() => {
+              createModal([
+                {
+                  type: 'label',
+                  label: 'Edit Channel',
+                  placeholder: 'none',
+                },
+                {
+                  type: 'text',
+                  label: 'Name',
+                  placeholder: currentChannel.channelName,
+                },
+                {
+                  type: 'text',
+                  label: 'Description',
+                  placeholder: currentChannel.channelDesc,
+                },
+                {
+                  type: 'textarea',
+                  label: 'Root Message',
+                  placeholder: 'need to fetch channel root',
+                },
+              ], 'Save');
+            }}
+          >
+            Edit Channel
+          </button>
+          <button
+            className="delete-channel"
+            type="button"
+            onClick={() => {
+              createModal([
+                {
+                  type: 'label',
+                  label: 'Delete Channel?',
+                  placeholder: 'none',
+                },
+              ], 'Confirm');
+            }}
+          >
+            Delete Channel
+          </button>
         </div>
       </HeaderBar>
       <ChannelNav>
+        <button
+          className="create-channel"
+          type="button"
+          onClick={() => {
+            createModal([
+              {
+                type: 'label',
+                label: 'Create Channel',
+                placeholder: 'none',
+              },
+              {
+                type: 'text',
+                label: 'Name',
+                placeholder: currentChannel.channelName,
+              },
+              {
+                type: 'text',
+                label: 'Description',
+                placeholder: currentChannel.channelDesc,
+              },
+              {
+                type: 'textarea',
+                label: 'Root Message',
+                placeholder: 'need to fetch channel root',
+              },
+            ], 'Create');
+          }}
+        >
+          Create Channel
+        </button>
         {channels.map((channel) => (
           <Link
             to={`/discord-clone/server/${serverKey}/${channel.channelKey}`}
@@ -228,6 +375,11 @@ function Home() {
           {
             type: 'label',
             label: 'Basic Question?',
+            placeholder: 'none',
+          },
+          {
+            type: 'label',
+            label: 'Q2',
             placeholder: 'none',
           },
         ], 'Custom Label');
