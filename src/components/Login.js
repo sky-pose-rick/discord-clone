@@ -17,8 +17,13 @@ function Login() {
 
   const onSubmit = (e) => {
     e.preventDefault();
+    const form = e.target;
+    // console.table(e.target);
 
-    FirebaseAuthUser.signIn(() => {
+    const email = form[0].value;
+    const password = form[1].value;
+
+    FirebaseAuthUser.signInUser(email, password, () => {
       navigate('/discord-clone/server/server1/channel1');
     });
   };
@@ -30,10 +35,8 @@ function Login() {
       <form action="" onSubmit={onSubmit}>
         <div className="input-wrapper">
           <LabelWrapper>
-            <label htmlFor="login-username">USERNAME</label>
-            <InputWrapper>
-              <FormInput name="username" id="login-username" type="text" required />
-            </InputWrapper>
+            <label htmlFor="login-email">EMAIL</label>
+            <InputWrapper><FormInput name="email" id="login-email" type="email" required /></InputWrapper>
           </LabelWrapper>
         </div>
         <div className="input-wrapper">

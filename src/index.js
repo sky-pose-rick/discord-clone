@@ -1,8 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import FirestoreUser from './logic/FirestoreUser';
+
 import './styles/index.css';
 import App from './App';
+import FirebaseAuthUser from './logic/FirebaseAuthUser';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -34,5 +36,12 @@ document.addEventListener('keyup', (e) => {
       user: 'Third User',
       messageKey: `genned-message-${counter}`,
     });
+  }
+
+  if (e.code === 'Numpad3') {
+    console.log('Num 3');
+    counter += 1;
+    // console.log(textContent);
+    FirebaseAuthUser.logoutUser();
   }
 });
