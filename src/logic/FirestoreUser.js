@@ -9,6 +9,11 @@ let messageCount = 0;
 let rootShown = false;
 const messagesToFetch = 12;
 
+function getUserDetails(user) {
+  // fetch user from firestore
+
+}
+
 function displayMessage(message, appendToStart) {
   if (!messageSubscriber) {
     console.error('Missing message subscriber');

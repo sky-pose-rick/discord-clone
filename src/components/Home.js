@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, {
+  useState, useEffect, useRef,
+} from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 // import styled from 'styled-components';
 import uniqid from 'uniqid';
 import ServerIcon from './ServerIcon';
@@ -125,7 +127,7 @@ function textSubmit(e) {
   // console.log(e);
   const textContent = e.target.value.trim();
   if (e.code === 'Enter' && textContent) {
-    const user = FirebaseAuthUser.getUser();
+    const user = FirebaseAuthUser.getUserAuth();
     // console.log(textContent);
     FirestoreUser.sendMessage({
       content: textContent,
@@ -180,7 +182,7 @@ function Home() {
   const currentServer = servers.find((server) => server.serverKey === serverKey) || {};
   const currentChannel = channels.find((channel) => channel.channelKey === channelKey) || {};
 
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const onContentScroll = useMouseWheel(mainRef);
   // console.log('render: ', messages);
 
@@ -374,15 +376,18 @@ function Home() {
         createModal([
           {
             type: 'label',
-            label: 'Basic Question?',
+            label: 'Signout?',
             placeholder: 'none',
           },
           {
             type: 'label',
-            label: 'Q2',
+            label: 'Confirm',
             placeholder: 'none',
           },
-        ], 'Custom Label');
+        ], 'Yes', () => {
+          FirebaseAuthUser.logoutUser();
+          navigate('/discord-clone/login');
+        });
       }}
       >
         User

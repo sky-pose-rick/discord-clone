@@ -59,9 +59,9 @@ function Register() {
         <LabelWrapper className="input-wrapper">
           <label htmlFor="register-month">DATE OF BIRTH</label>
           <InputWrapper>
-            <FormInput name="register-month" type="text" required />
-            <FormInput name="register-day" type="text" required />
-            <FormInput name="register-year" type="text" required />
+            <FormInput name="register-month" type="text" placeholder="Month #" required />
+            <FormInput name="register-day" type="text" placeholder="Day #" required />
+            <FormInput name="register-year" type="text" placeholder="Year" required />
           </InputWrapper>
         </LabelWrapper>
         <button type="submit">Continue</button>
