@@ -3,6 +3,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  updateProfile,
 } from 'firebase/auth';
 import FirebaseApp from './FirebaseApp';
 
@@ -32,6 +33,7 @@ function registerUser(userDetails, onSignIn) {
       // Signed in
       console.log('user created', email);
       user = userCredential.user;
+      updateProfile(user, { displayName: userDetails.username });
       if (onSignIn) { onSignIn(user); }
     })
     .catch((error) => {

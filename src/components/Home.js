@@ -123,17 +123,33 @@ function useChannels(serverKey) {
   return channels;
 }
 
+function useUser() {
+  const [user, setUser] = useState({});
+
+  useEffect(() => {
+    const userPromise = FirebaseAuthUser.getUserAuth();
+
+    userPromise.then((data) => {
+      setUser(data);
+    });
+  }, []);
+
+  return user;
+}
+
 function textSubmit(e) {
   // console.log(e);
   const textContent = e.target.value.trim();
   if (e.code === 'Enter' && textContent) {
-    const user = FirebaseAuthUser.getUserAuth();
-    // console.log(textContent);
-    FirestoreUser.sendMessage({
-      content: textContent,
-      timestamp: 'Now',
-      user: user.username,
-      messageKey: uniqid(),
+    const userPromise = FirebaseAuthUser.getUserAuth();
+    userPromise.then((data) => {
+      // console.log(textContent);
+      FirestoreUser.sendMessage({
+        content: textContent,
+        timestamp: 'Now',
+        user: data.displayName,
+        messageKey: uniqid(),
+      });
     });
     e.target.value = '';
     e.stopPropagation();
@@ -177,6 +193,7 @@ function Home() {
   const servers = useServers();
   const channels = useChannels(serverKey);
   const messages = useMessages(channelKey, mainRef);
+  const currentUser = useUser();
   const createModal = modalService.useModal();
 
   const currentServer = servers.find((server) => server.serverKey === serverKey) || {};
@@ -185,6 +202,7 @@ function Home() {
   const navigate = useNavigate();
   const onContentScroll = useMouseWheel(mainRef);
   // console.log('render: ', messages);
+  // console.log(currentUser);
 
   return (
     <ServerFrame>
@@ -390,7 +408,7 @@ function Home() {
         });
       }}
       >
-        User
+        { currentUser && currentUser.displayName }
       </UserPanel>
       <MainContent onWheelCapture={onContentScroll} ref={mainRef}>
         {
