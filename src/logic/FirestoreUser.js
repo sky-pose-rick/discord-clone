@@ -1,4 +1,11 @@
+import {
+  getFirestore, collection, getDocs, query, orderBy, limit, onSnapshot,
+} from 'firebase/firestore';
+
 import fakeStorage from './fakeStorage';
+import FirebaseAuthUser from './FirebaseAuthUser';
+
+const db = getFirestore();
 
 let messageSubscriber = null;
 let serverSubscriber = null;
@@ -96,14 +103,32 @@ function subscribeToMessages(
 }
 
 function subscribeToServers(onReplaceServerList) {
-  // should make some connection to firestore here
-
+  // doesn't actually work because this value won't be overwritten ever
   serverSubscriber = { onReplaceServerList };
+
+  // get current user
+  FirebaseAuthUser.getUserAuth().then((user) => {
+    // should make some connection to firestore here
+    const serverQuery = query(collection(db, 'users', user.uid, 'servers'));
+    onSnapshot(serverQuery, (snapshot) => {
+      const serverList = [];
+      snapshot.forEach((serverDoc) => {
+        const data = serverDoc.data();
+        const newServer = {
+          serverKey: serverDoc.id,
+          serverName: data.name,
+          iconURL: data.iconURL,
+          altText: 'dummy',
+        };
+        serverList.push(newServer);
+      });
+      onReplaceServerList(serverList);
+    });
+  });
 }
 
 function unSubscribeToServers() {
   // should stop listening to firestore snapshots here
-
   serverSubscriber = null;
 }
 
