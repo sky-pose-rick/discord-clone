@@ -243,7 +243,9 @@ function Home() {
                 label: 'Icon',
                 placeholder: '',
               },
-            ], 'Create');
+            ], 'Create', (inputValues) => {
+              FirestoreUser.createNewServer(currentUser, inputValues[1], inputValues[2]);
+            });
           }}
         >
           <ServerIcon

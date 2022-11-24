@@ -1,6 +1,14 @@
 import {
   getFirestore, collection, getDocs, query, orderBy, limit, onSnapshot,
+  addDoc, updateDoc, doc, setDoc,
 } from 'firebase/firestore';
+
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from 'firebase/storage';
 
 import fakeStorage from './fakeStorage';
 import FirebaseAuthUser from './FirebaseAuthUser';
@@ -233,6 +241,30 @@ function pushFakeContent() {
   }
 }
 
+async function createNewServer(owner, name, icon) {
+  // create a new document
+  const serverRef = await addDoc(collection(db, 'servers'), {
+    name,
+    iconURL: 'IMAGE_NOT_FOUND',
+  });
+
+  // update user's server list
+  await setDoc(doc(db, 'users', owner.uid, 'servers', serverRef.id), {});
+
+  // upload the image to storage
+  const imageRef = ref(getStorage(), `${serverRef.id}/${icon.name}`);
+  const imageSnapshot = await uploadBytesResumable(imageRef, icon);
+
+  // public url for image
+  const publicImageURL = await getDownloadURL(imageRef);
+
+  // update server document
+  await updateDoc(serverRef, {
+    iconURL: publicImageURL,
+    storageUri: imageSnapshot.metadata.fullPath,
+  });
+}
+
 export default {
   sendMessage,
   deleteMessage,
@@ -245,4 +277,5 @@ export default {
   pushTestContent,
   pushFakeContent,
   loadMoreMessages,
+  createNewServer,
 };

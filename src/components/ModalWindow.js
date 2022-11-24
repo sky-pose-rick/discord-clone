@@ -64,7 +64,16 @@ function makeInput(input, index, onInputChange, inputValues) {
       return (
         <div key={index}>
           <label htmlFor={id}>{label}</label>
-          <input type="file" value={inputValues[index]} onChange={onChange} id={id} />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              e.preventDefault();
+              const file = e.target.files[0];
+              onInputChange(index, file);
+            }}
+            id={id}
+          />
         </div>
       );
     default:
