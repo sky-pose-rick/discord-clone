@@ -1,6 +1,6 @@
 import {
   getFirestore, collection, getDocs, query, orderBy, limit, onSnapshot,
-  addDoc, updateDoc, doc, setDoc, getDoc, serverTimestamp,
+  addDoc, updateDoc, doc, setDoc, getDoc, serverTimestamp, startAfter,
 } from 'firebase/firestore';
 
 import {
@@ -21,6 +21,7 @@ let channelSubscriber = null;
 let activeChannelKey = null;
 let activeServerKey = null;
 let messageCount = 0;
+let messageCursor = null;
 let rootShown = false;
 const messagesToFetch = 12;
 
@@ -43,24 +44,39 @@ function displayMessage(message, appendToStart) {
 }
 
 async function loadMoreMessages() {
-  if (messageSubscriber && activeChannelKey) {
-    // console.log('valid channel is active');
-    const messages = fakeStorage.getMessages(
-      activeServerKey,
-      activeChannelKey,
-      messageCount,
-      messagesToFetch,
-    );
+  if (messageSubscriber && activeChannelKey && !rootShown) {
+    // adjust to use a cursor later
+    const channelDoc = doc(db, 'servers', activeServerKey, 'channels', activeChannelKey);
+    const messageColl = collection(channelDoc, 'messages');
+    let messageQuery;
+    if (messageCursor) {
+      messageQuery = query(messageColl, orderBy('timestamp', 'desc'), limit(messagesToFetch), startAfter(messageCursor));
+    } else {
+      messageQuery = query(messageColl, orderBy('timestamp', 'desc'), limit(messagesToFetch));
+    }
 
-    messages.reverse().forEach((message) => {
-      displayMessage(message, true);
+    const messageBatch = await (getDocs(messageQuery));
+    const messagesFetched = messageBatch.docs.length;
+    messageBatch.forEach((message) => {
+      const data = message.data();
+      // console.log(data.timestamp);
+      const newMessage = {
+        user: data.user,
+        timestamp: `${data.timestamp.seconds} `,
+        content: data.content,
+        messageKey: message.id,
+      };
+      displayMessage(newMessage, true);
     });
+    if (messagesFetched > 0) {
+      messageCursor = messageBatch.docs[messagesFetched - 1];
+    }
 
-    messageCount += messages.length;
+    messageCount += messagesFetched;
 
-    if (messages.length < messagesToFetch && !rootShown) {
+    if (messagesFetched < messagesToFetch) {
       // fetch the channel root from firestore
-      const channelDoc = doc(db, 'servers', activeServerKey, 'channels', activeChannelKey);
+
       const channelRef = await getDoc(channelDoc);
       const channelData = channelRef.data();
       if (channelData) {
@@ -77,7 +93,7 @@ async function loadMoreMessages() {
 
 async function sendMessage(message) {
   // need to create a new document for this message
-  console.log('new message', activeServerKey, activeChannelKey);
+  // console.log('new message', activeServerKey, activeChannelKey);
   const messageColl = collection(db, 'servers', activeServerKey, 'channels', activeChannelKey, 'messages');
   const messageObj = {
     user: message.user,
@@ -122,6 +138,8 @@ function subscribeToMessages(
   onClearMessages();
   activeChannelKey = channelKey;
   rootShown = false;
+  messageCursor = null;
+  messageCount = 0;
   messageSubscriber = {
     onNewMessage, onChangeMessage, onDeleteMessage, onClearMessages,
   };
