@@ -99,7 +99,7 @@ function useServers() {
     return () => {
       FirestoreUser.unSubscribeToServers();
     };
-  }, [servers]);
+  }, []);
 
   return servers;
 }
