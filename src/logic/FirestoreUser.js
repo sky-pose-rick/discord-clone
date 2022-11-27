@@ -1,6 +1,6 @@
 import {
   getFirestore, collection, getDocs, query, orderBy, limit, onSnapshot,
-  addDoc, updateDoc, doc, setDoc,
+  addDoc, updateDoc, doc, setDoc, getDoc,
 } from 'firebase/firestore';
 
 import {
@@ -111,32 +111,48 @@ function subscribeToMessages(
 }
 
 function subscribeToServers(onReplaceServerList) {
-  // doesn't actually work because this value won't be overwritten ever
+  console.log('server list subscriber called');
   serverSubscriber = { onReplaceServerList };
 
   // get current user
   FirebaseAuthUser.getUserAuth().then((user) => {
     // should make some connection to firestore here
+    // find list of servers the user is subscribed to
     const serverQuery = query(collection(db, 'users', user.uid, 'servers'));
-    onSnapshot(serverQuery, (snapshot) => {
+    const unsub = onSnapshot(serverQuery, (snapshot) => {
       const serverList = [];
-      snapshot.forEach((serverDoc) => {
-        const data = serverDoc.data();
-        const newServer = {
-          serverKey: serverDoc.id,
-          serverName: data.name,
-          iconURL: data.iconURL,
-          altText: 'dummy',
-        };
-        serverList.push(newServer);
+      snapshot.forEach(async (serverID) => {
+        // need to grab server from server list
+
+        const serverRef = doc(db, 'servers', serverID.id);
+        const serverDoc = await getDoc(serverRef);
+        const serverData = serverDoc.data();
+        // filter out any subscribed servers that have been deleted from firestore
+        if (serverData) {
+          const newServer = {
+            serverKey: serverDoc.id,
+            serverName: serverData.name,
+            iconURL: serverData.iconURL,
+            altText: serverData.name.slice(0, 3).toUpperCase(),
+            // altText: 'summy',
+          };
+          serverList.push(newServer);
+          // call here because foreach loop is not waited for
+          onReplaceServerList(serverList);
+        }
       });
-      onReplaceServerList(serverList);
     });
+
+    serverSubscriber.unsub = unsub;
   });
 }
 
 function unSubscribeToServers() {
   // should stop listening to firestore snapshots here
+  if (serverSubscriber.unsub) {
+    serverSubscriber.unsub();
+  }
+
   serverSubscriber = null;
 }
 
@@ -241,6 +257,10 @@ function pushFakeContent() {
   }
 }
 
+async function createNewChannel(serverRef, name, desc, root) {
+  await addDoc(collection(serverRef, 'channels'), { name, desc, root });
+}
+
 async function createNewServer(owner, name, icon) {
   // create a new document
   const serverRef = await addDoc(collection(db, 'servers'), {
@@ -250,6 +270,9 @@ async function createNewServer(owner, name, icon) {
 
   // update user's server list
   await setDoc(doc(db, 'users', owner.uid, 'servers', serverRef.id), {});
+
+  // create a welcome channel
+  await createNewChannel(serverRef, 'Welcome', 'The welcome channel', 'Welcome to the server');
 
   // upload the image to storage
   const imageRef = ref(getStorage(), `${serverRef.id}/${icon.name}`);
