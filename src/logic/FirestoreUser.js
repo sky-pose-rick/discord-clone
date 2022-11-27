@@ -111,7 +111,6 @@ function subscribeToMessages(
 }
 
 function subscribeToServers(onReplaceServerList) {
-  console.log('server list subscriber called');
   serverSubscriber = { onReplaceServerList };
 
   // get current user
@@ -157,14 +156,39 @@ function unSubscribeToServers() {
 }
 
 function subscribeToChannels(serverKey, onReplaceChannelList) {
-  // should make some connection to firestore here
-
-  activeServerKey = serverKey;
   channelSubscriber = { onReplaceChannelList };
+  // should make some connection to firestore here
+  activeServerKey = serverKey;
+  // fetch all channels from serverkey
+  const channelQuery = query(collection(db, 'servers', serverKey, 'channels'));
+  const unsub = onSnapshot(channelQuery, (snapshot) => {
+    const channelList = [];
+    snapshot.forEach(async (channelDoc) => {
+      // need to grab server from server list
+      const channelData = channelDoc.data();
+      // check that the channel has some associated data
+      if (channelData) {
+        const newChannel = {
+          channelKey: channelDoc.id,
+          channelName: channelData.name,
+          channelDesc: channelData.desc,
+          channelRoot: channelData.root,
+        };
+        channelList.push(newChannel);
+        // call here because foreach loop is not waited for
+        onReplaceChannelList(channelList);
+      }
+    });
+  });
+
+  channelSubscriber.unsub = unsub;
 }
 
 function unSubscribeToChannels() {
   // should stop listening to firestore snapshots here
+  if (channelSubscriber.unsub) {
+    channelSubscriber.unsub();
+  }
 
   activeServerKey = null;
   channelSubscriber = null;
