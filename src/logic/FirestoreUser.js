@@ -1,6 +1,6 @@
 import {
   getFirestore, collection, getDocs, query, orderBy, limit, onSnapshot,
-  addDoc, updateDoc, doc, setDoc, getDoc,
+  addDoc, updateDoc, doc, setDoc, getDoc, serverTimestamp,
 } from 'firebase/firestore';
 
 import {
@@ -75,8 +75,21 @@ async function loadMoreMessages() {
   }
 }
 
-function sendMessage(message) {
-  displayMessage(message);
+async function sendMessage(message) {
+  // need to create a new document for this message
+  console.log('new message', activeServerKey, activeChannelKey);
+  const messageColl = collection(db, 'servers', activeServerKey, 'channels', activeChannelKey, 'messages');
+  const messageObj = {
+    user: message.user,
+    timestamp: serverTimestamp(),
+    content: message.content,
+  };
+
+  const messageRef = await addDoc(messageColl, messageObj);
+  // remove this later and let the listener display user's own messages
+  messageObj.messageKey = messageRef.id;
+  messageObj.timestamp = 'now';
+  displayMessage(messageObj);
 }
 
 function deleteMessage(key) {

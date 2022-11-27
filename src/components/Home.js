@@ -147,7 +147,7 @@ function textSubmit(e) {
       FirestoreUser.sendMessage({
         content: textContent,
         timestamp: 'Now',
-        user: data.displayName,
+        user: data.uid,
         messageKey: uniqid(),
       });
     });
