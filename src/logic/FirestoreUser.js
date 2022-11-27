@@ -42,7 +42,7 @@ function displayMessage(message, appendToStart) {
   // console.log('sent:', message);
 }
 
-function loadMoreMessages() {
+async function loadMoreMessages() {
   if (messageSubscriber && activeChannelKey) {
     // console.log('valid channel is active');
     const messages = fakeStorage.getMessages(
@@ -59,13 +59,18 @@ function loadMoreMessages() {
     messageCount += messages.length;
 
     if (messages.length < messagesToFetch && !rootShown) {
-      const rootMessage = fakeStorage.getChannelRoot(activeServerKey, activeChannelKey);
-      displayMessage({
-        content: rootMessage,
-        messageKey: `${activeChannelKey}-root`,
-        isRoot: true,
-      }, true);
-      rootShown = true;
+      // fetch the channel root from firestore
+      const channelDoc = doc(db, 'servers', activeServerKey, 'channels', activeChannelKey);
+      const channelRef = await getDoc(channelDoc);
+      const channelData = channelRef.data();
+      if (channelData) {
+        displayMessage({
+          content: channelData.root,
+          messageKey: `${activeChannelKey}-root`,
+          isRoot: true,
+        }, true);
+        rootShown = true;
+      }
     }
   }
 }
