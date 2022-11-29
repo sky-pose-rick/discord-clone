@@ -20,7 +20,6 @@ let serverSubscriber = null;
 let channelSubscriber = null;
 let activeChannelKey = null;
 let activeServerKey = null;
-let messageCount = 0;
 let messageCursor = null;
 let rootShown = false;
 const messagesToFetch = 12;
@@ -72,8 +71,6 @@ async function loadMoreMessages() {
       messageCursor = messageBatch.docs[messagesFetched - 1];
     }
 
-    messageCount += messagesFetched;
-
     if (messagesFetched < messagesToFetch) {
       // fetch the channel root from firestore
 
@@ -103,9 +100,9 @@ async function sendMessage(message) {
 
   const messageRef = await addDoc(messageColl, messageObj);
   // remove this later and let the listener display user's own messages
-  messageObj.messageKey = messageRef.id;
+  /* messageObj.messageKey = messageRef.id;
   messageObj.timestamp = 'now';
-  displayMessage(messageObj);
+  displayMessage(messageObj); */
 }
 
 function deleteMessage(key) {
@@ -121,28 +118,77 @@ function unSubscribeToMessages() {
   // should stop listening to firestore snapshots here
 
   activeChannelKey = null;
-  messageCount = 0;
+
+  if (messageSubscriber.unsub) {
+    messageSubscriber.unsub();
+  }
+
   messageSubscriber = null;
   // console.log('Unsubscribed to messages');
 }
 
-function subscribeToMessages(
+async function subscribeToMessages(
   channelKey,
   onNewMessage,
   onChangeMessage,
   onDeleteMessage,
   onClearMessages,
 ) {
-  // should start listening to firestore snapshots here
-
   onClearMessages();
   activeChannelKey = channelKey;
   rootShown = false;
   messageCursor = null;
-  messageCount = 0;
+
   messageSubscriber = {
     onNewMessage, onChangeMessage, onDeleteMessage, onClearMessages,
   };
+
+  // should start listening to firestore snapshots here
+  const messageColl = collection(db, 'servers', activeServerKey, 'channels', activeChannelKey, 'messages');
+  // ignores changes/deletes that are not recent
+  const messageQuery = query(messageColl, orderBy('timestamp', 'desc'), limit(messagesToFetch));
+  const unsub = onSnapshot(messageQuery, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+      if (change.type === 'added') {
+        // new message
+        const data = change.doc.data();
+        const newMessage = {
+          user: data.user,
+          timestamp: (data.timestamp) ? `${data.timestamp.seconds} ` : 'now',
+          content: data.content,
+          messageKey: change.doc.id,
+        };
+
+        // compare to message cursor
+        if (messageCursor) {
+          const cursorTimestamp = messageCursor.data().timestamp;
+          const newTimestamp = data.timestamp;
+          if (newTimestamp
+            && ((cursorTimestamp.seconds === newTimestamp.seconds
+                && cursorTimestamp.nanoseconds > newTimestamp.nanoseconds)
+              || (cursorTimestamp.seconds > newTimestamp.seconds))) {
+            messageCursor = change.doc;
+            onNewMessage(newMessage, true);
+          } else { onNewMessage(newMessage, false); }
+        } else {
+          onNewMessage(newMessage, false);
+          messageCursor = change.doc;
+        }
+      }
+      if (change.type === 'modified') {
+        // test if this message is flagged as deleted
+        if (change.doc.data.content === 'deleted') {
+          onDeleteMessage(change.doc.id);
+        }
+      }
+      if (change.type === 'removed') {
+        // manually removed from database
+        onDeleteMessage(change.doc.id);
+      }
+    });
+  });
+
+  channelSubscriber.unsub = unsub;
   // console.log('Got a subscription to messages');
 }
 
@@ -302,7 +348,6 @@ function pushFakeContent() {
       const messages = fakeStorage.getMessages(
         activeServerKey,
         activeChannelKey,
-        messageCount,
         messagesToFetch,
       );
 
@@ -311,8 +356,6 @@ function pushFakeContent() {
       messages.forEach((message) => {
         displayMessage(message);
       });
-
-      messageCount += messages.length;
     }
   }
 }
