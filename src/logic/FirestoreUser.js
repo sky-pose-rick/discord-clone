@@ -48,6 +48,9 @@ async function loadMoreMessages() {
     const channelDoc = doc(db, 'servers', activeServerKey, 'channels', activeChannelKey);
     const messageColl = collection(channelDoc, 'messages');
     let messageQuery;
+    if (messageCursor && !messageCursor.data().timestamp) {
+      messageCursor = await getDoc(doc(messageColl, messageCursor.id));
+    }
     if (messageCursor) {
       messageQuery = query(messageColl, orderBy('timestamp', 'desc'), limit(messagesToFetch), startAfter(messageCursor));
     } else {
@@ -98,11 +101,7 @@ async function sendMessage(message) {
     content: message.content,
   };
 
-  const messageRef = await addDoc(messageColl, messageObj);
-  // remove this later and let the listener display user's own messages
-  /* messageObj.messageKey = messageRef.id;
-  messageObj.timestamp = 'now';
-  displayMessage(messageObj); */
+  await addDoc(messageColl, messageObj);
 }
 
 function deleteMessage(key) {

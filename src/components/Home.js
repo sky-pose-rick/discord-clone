@@ -178,7 +178,7 @@ function useMouseWheel(mainRef) {
       setTicking(true);
       setTimeout(() => {
         setTicking(false);
-      }, 250);
+      }, 1250);
     }
   };
 
@@ -427,7 +427,7 @@ function Home() {
         }
       </MainContent>
       <InputBox>
-        <textarea type="text" placeholder="Message #Channel-name" onKeyUp={textSubmit} />
+        <textarea type="text" placeholder={`Message #${currentChannel.channelName}`} onKeyUp={textSubmit} />
       </InputBox>
       <UserList>
         UserList
