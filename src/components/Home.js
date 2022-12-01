@@ -211,7 +211,7 @@ function Home() {
         <div className="line" />
         {servers.map((server) => (
           <Link
-            to={`/discord-clone/server/${server.serverKey}/fake-channel`}
+            to={`/discord-clone/server/${server.serverKey}/${server.defaultChannel}`}
             aria-current={server.serverKey === serverKey ? 'true' : 'false'}
             key={server.serverKey}
           >

@@ -217,12 +217,21 @@ function subscribeToServers(onReplaceServerList) {
         const serverData = serverDoc.data();
         // filter out any subscribed servers that have been deleted from firestore
         if (serverData) {
+          // get a channel from the server
+          if (!serverData.defaultChannel) {
+            const channelQuery = query(collection(serverRef, 'channels'), limit(1));
+            const channelDocs = await getDocs(channelQuery);
+            if (channelDocs.docs[0]) {
+              serverData.defaultChannel = channelDocs.docs[0].id;
+            }
+          }
+
           const newServer = {
             serverKey: serverDoc.id,
             serverName: serverData.name,
             iconURL: serverData.iconURL,
             altText: serverData.name.slice(0, 3).toUpperCase(),
-            // altText: 'summy',
+            defaultChannel: serverData.defaultChannel,
           };
           serverList.push(newServer);
           // call here because foreach loop is not waited for
@@ -407,6 +416,7 @@ async function createNewServer(owner, name, icon) {
   await updateDoc(serverRef, {
     iconURL: publicImageURL,
     storageUri: imageSnapshot.metadata.fullPath,
+    defaultChannel: channelID,
   });
 
   const newServer = {
