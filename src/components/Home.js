@@ -9,6 +9,7 @@ import Message from './Message';
 import FirestoreUser from '../logic/FirestoreUser';
 import FirebaseAuthUser from '../logic/FirebaseAuthUser';
 import modalService from '../logic/modalService';
+import modals from '../logic/modals';
 
 import ServerStyles from '../component-styles/ServerStyles';
 
@@ -194,7 +195,6 @@ function Home() {
   const channels = useChannels(serverKey);
   const messages = useMessages(channelKey, mainRef);
   const currentUser = useUser();
-  const createModal = modalService.useModal();
 
   const currentServer = servers.find((server) => server.serverKey === serverKey) || {};
   const currentChannel = channels.find((channel) => channel.channelKey === channelKey) || {};
@@ -227,24 +227,8 @@ function Home() {
           role="button"
           tabIndex="0"
           onClick={() => {
-            createModal([
-              {
-                type: 'label',
-                label: 'Create Server',
-                placeholder: 'none',
-              },
-              {
-                type: 'text',
-                label: 'Name',
-                placeholder: 'new-server',
-              },
-              {
-                type: 'file',
-                label: 'Icon',
-                placeholder: '',
-              },
-            ], 'Create', (inputValues) => {
-              FirestoreUser.createNewServer(currentUser, inputValues[1], inputValues[2]);
+            modals.createServerModal(currentUser, (newServerKey, newChannelKey) => {
+              navigate(`/discord-clone/servers/${newServerKey}/${newChannelKey}`);
             });
           }}
         >
@@ -266,23 +250,7 @@ function Home() {
             className="edit-server"
             type="button"
             onClick={() => {
-              createModal([
-                {
-                  type: 'label',
-                  label: 'Edit Server',
-                  placeholder: 'none',
-                },
-                {
-                  type: 'text',
-                  label: 'Name',
-                  placeholder: currentServer.serverName,
-                },
-                {
-                  type: 'file',
-                  label: 'Icon',
-                  placeholder: '',
-                },
-              ], 'Save');
+              modals.editServerModal(currentServer);
             }}
           >
             Edit Server
@@ -291,13 +259,7 @@ function Home() {
             className="delete-server"
             type="button"
             onClick={() => {
-              createModal([
-                {
-                  type: 'label',
-                  label: 'Delete Server?',
-                  placeholder: 'none',
-                },
-              ], 'Confirm');
+              modals.deleteServerModal(currentServer);
             }}
           >
             Delete Server
@@ -306,28 +268,7 @@ function Home() {
             className="edit-channel"
             type="button"
             onClick={() => {
-              createModal([
-                {
-                  type: 'label',
-                  label: 'Edit Channel',
-                  placeholder: 'none',
-                },
-                {
-                  type: 'text',
-                  label: 'Name',
-                  placeholder: currentChannel.channelName,
-                },
-                {
-                  type: 'text',
-                  label: 'Description',
-                  placeholder: currentChannel.channelDesc,
-                },
-                {
-                  type: 'textarea',
-                  label: 'Root Message',
-                  placeholder: 'need to fetch channel root',
-                },
-              ], 'Save');
+              modals.editChannelModal(currentChannel);
             }}
           >
             Edit Channel
@@ -336,13 +277,7 @@ function Home() {
             className="delete-channel"
             type="button"
             onClick={() => {
-              createModal([
-                {
-                  type: 'label',
-                  label: 'Delete Channel?',
-                  placeholder: 'none',
-                },
-              ], 'Confirm');
+              modals.deleteChannelModal(currentChannel);
             }}
           >
             Delete Channel
@@ -354,28 +289,7 @@ function Home() {
           className="create-channel"
           type="button"
           onClick={() => {
-            createModal([
-              {
-                type: 'label',
-                label: 'Create Channel',
-                placeholder: 'none',
-              },
-              {
-                type: 'text',
-                label: 'Name',
-                placeholder: currentChannel.channelName,
-              },
-              {
-                type: 'text',
-                label: 'Description',
-                placeholder: currentChannel.channelDesc,
-              },
-              {
-                type: 'textarea',
-                label: 'Root Message',
-                placeholder: 'need to fetch channel root',
-              },
-            ], 'Create');
+            modals.createChannelModal(currentServer);
           }}
         >
           Create Channel
@@ -393,19 +307,7 @@ function Home() {
         ))}
       </ChannelNav>
       <UserPanel onClick={() => {
-        createModal([
-          {
-            type: 'label',
-            label: 'Signout?',
-            placeholder: 'none',
-          },
-          {
-            type: 'label',
-            label: 'Confirm',
-            placeholder: 'none',
-          },
-        ], 'Yes', () => {
-          FirebaseAuthUser.logoutUser();
+        modals.signOutModal(() => {
           navigate('/discord-clone/login');
         });
       }}
