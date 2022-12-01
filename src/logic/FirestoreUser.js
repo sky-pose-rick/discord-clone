@@ -360,7 +360,7 @@ function pushFakeContent() {
 }
 
 async function createNewChannel(serverRef, name, desc, root) {
-  await addDoc(collection(serverRef, 'channels'), { name, desc, root });
+  return addDoc(collection(serverRef, 'channels'), { name, desc, root });
 }
 
 async function createNewServer(owner, name, icon) {
@@ -374,7 +374,7 @@ async function createNewServer(owner, name, icon) {
   await setDoc(doc(db, 'users', owner.uid, 'servers', serverRef.id), {});
 
   // create a welcome channel
-  await createNewChannel(serverRef, 'Welcome', 'The welcome channel', 'Welcome to the server');
+  const channelDoc = await createNewChannel(serverRef, 'Welcome', 'The welcome channel', 'Welcome to the server');
 
   // upload the image to storage
   const imageRef = ref(getStorage(), `${serverRef.id}/${icon.name}`);
@@ -388,6 +388,12 @@ async function createNewServer(owner, name, icon) {
     iconURL: publicImageURL,
     storageUri: imageSnapshot.metadata.fullPath,
   });
+
+  const newServer = {
+    serverKey: serverRef.id,
+    channelKey: channelDoc.id,
+  };
+  return newServer;
 }
 
 export default {

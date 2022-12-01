@@ -134,7 +134,7 @@ function createChannelModal(currentServer, after) {
   });
 }
 
-async function createServerModal(currentUser, changeToServer) {
+function createServerModal(currentUser, changeToServer) {
   createModal([
     {
       type: 'label',
@@ -151,8 +151,12 @@ async function createServerModal(currentUser, changeToServer) {
       label: 'Icon',
       placeholder: '',
     },
-  ], 'Create', (inputValues) => {
-    const newServer = FirestoreUser.createNewServer(currentUser, inputValues[1], inputValues[2]);
+  ], 'Create', async (inputValues) => {
+    const newServer = await FirestoreUser.createNewServer(
+      currentUser,
+      inputValues[1],
+      inputValues[2],
+    );
     if (changeToServer) {
       changeToServer(newServer.serverKey, newServer.channelKey);
     }

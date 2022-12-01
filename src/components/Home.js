@@ -228,7 +228,7 @@ function Home() {
           tabIndex="0"
           onClick={() => {
             modals.createServerModal(currentUser, (newServerKey, newChannelKey) => {
-              navigate(`/discord-clone/servers/${newServerKey}/${newChannelKey}`);
+              navigate(`/discord-clone/server/${newServerKey}/${newChannelKey}`);
             });
           }}
         >
