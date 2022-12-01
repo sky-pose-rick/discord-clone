@@ -29,6 +29,14 @@ function getUserDetails(user) {
 
 }
 
+function makeChannelDoc(serverKey, channelKey) {
+  return doc(db, 'servers', serverKey, 'channels', channelKey);
+}
+
+function makeServerDoc(serverKey) {
+  return doc(db, 'servers', serverKey);
+}
+
 function displayMessage(message, appendToStart) {
   if (!messageSubscriber) {
     console.error('Missing message subscriber');
@@ -45,7 +53,7 @@ function displayMessage(message, appendToStart) {
 async function loadMoreMessages() {
   if (messageSubscriber && activeChannelKey && !rootShown) {
     // adjust to use a cursor later
-    const channelDoc = doc(db, 'servers', activeServerKey, 'channels', activeChannelKey);
+    const channelDoc = makeChannelDoc(activeServerKey, activeChannelKey);
     const messageColl = collection(channelDoc, 'messages');
     let messageQuery;
     if (messageCursor && !messageCursor.data().timestamp) {
@@ -254,6 +262,7 @@ function subscribeToChannels(serverKey, onReplaceChannelList) {
           channelName: channelData.name,
           channelDesc: channelData.desc,
           channelRoot: channelData.root,
+          serverKey,
         };
         channelList.push(newChannel);
         // call here because foreach loop is not waited for
@@ -359,8 +368,19 @@ function pushFakeContent() {
   }
 }
 
-async function createNewChannel(serverRef, name, desc, root) {
-  return addDoc(collection(serverRef, 'channels'), { name, desc, root });
+async function createNewChannel(serverKey, name, desc, root) {
+  const serverDoc = makeServerDoc(serverKey);
+  const channelDoc = await addDoc(collection(serverDoc, 'channels'), { name, desc, root });
+  return channelDoc.id;
+}
+
+async function updateChannel(serverKey, channelKey, name, desc, root) {
+  const channelDoc = makeChannelDoc(serverKey, channelKey);
+  updateDoc(channelDoc, {
+    name,
+    desc,
+    root,
+  });
 }
 
 async function createNewServer(owner, name, icon) {
@@ -374,7 +394,7 @@ async function createNewServer(owner, name, icon) {
   await setDoc(doc(db, 'users', owner.uid, 'servers', serverRef.id), {});
 
   // create a welcome channel
-  const channelDoc = await createNewChannel(serverRef, 'Welcome', 'The welcome channel', 'Welcome to the server');
+  const channelID = await createNewChannel(serverRef.id, 'Welcome', 'The welcome channel', 'Welcome to the server');
 
   // upload the image to storage
   const imageRef = ref(getStorage(), `${serverRef.id}/${icon.name}`);
@@ -391,9 +411,33 @@ async function createNewServer(owner, name, icon) {
 
   const newServer = {
     serverKey: serverRef.id,
-    channelKey: channelDoc.id,
+    channelKey: channelID,
   };
   return newServer;
+}
+
+async function updateServer(serverKey, name, icon) {
+  const serverDoc = makeServerDoc(serverKey);
+
+  if (icon) {
+    // upload new image to storage
+    const imageRef = ref(getStorage(), `${serverKey}/${icon.name}`);
+    const imageSnapshot = await uploadBytesResumable(imageRef, icon);
+
+    // public url for image
+    const publicImageURL = await getDownloadURL(imageRef);
+
+    // update server document
+    await updateDoc(serverDoc, {
+      name,
+      iconURL: publicImageURL,
+      storageUri: imageSnapshot.metadata.fullPath,
+    });
+  } else {
+    await updateDoc(serverDoc, {
+      name,
+    });
+  }
 }
 
 export default {
@@ -409,4 +453,7 @@ export default {
   pushFakeContent,
   loadMoreMessages,
   createNewServer,
+  updateChannel,
+  createNewChannel,
+  updateServer,
 };

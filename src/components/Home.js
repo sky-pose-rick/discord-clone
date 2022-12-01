@@ -227,8 +227,8 @@ function Home() {
           role="button"
           tabIndex="0"
           onClick={() => {
-            modals.createServerModal(currentUser, (newServerKey, newChannelKey) => {
-              navigate(`/discord-clone/server/${newServerKey}/${newChannelKey}`);
+            modals.createServerModal(currentUser, (nextServerkey, nextChannelKey) => {
+              navigate(`/discord-clone/server/${nextServerkey}/${nextChannelKey}`);
             });
           }}
         >
@@ -289,7 +289,9 @@ function Home() {
           className="create-channel"
           type="button"
           onClick={() => {
-            modals.createChannelModal(currentServer);
+            modals.createChannelModal(currentServer, (nextServerkey, nextChannelKey) => {
+              navigate(`/discord-clone/server/${nextServerkey}/${nextChannelKey}`);
+            });
           }}
         >
           Create Channel

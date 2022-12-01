@@ -38,10 +38,11 @@ function editServerModal(currentServer, after) {
     },
     {
       type: 'file',
-      label: 'Icon',
+      label: 'Change Icon?',
       placeholder: '',
     },
-  ], 'Save', () => {
+  ], 'Save', (inputValues) => {
+    FirestoreUser.updateServer(currentServer.serverKey, inputValues[1], inputValues[2]);
     if (after) {
       after();
     }
@@ -82,9 +83,21 @@ function editChannelModal(currentChannel, after) {
     {
       type: 'textarea',
       label: 'Root Message',
-      placeholder: 'need to fetch channel root',
+      placeholder: currentChannel.channelRoot,
     },
-  ], 'Save', () => {
+  ], 'Save', async (inputValues) => {
+    const newName = inputValues[1];
+    const newDesc = inputValues[2];
+    const newRoot = inputValues[3];
+
+    FirestoreUser.updateChannel(
+      currentChannel.serverKey,
+      currentChannel.channelKey,
+      newName,
+      newDesc,
+      newRoot,
+    );
+
     if (after) {
       after();
     }
@@ -105,7 +118,7 @@ function deleteChannelModal(currentChannel, after) {
   });
 }
 
-function createChannelModal(currentServer, after) {
+function createChannelModal(currentServer, changeToChannel) {
   createModal([
     {
       type: 'label',
@@ -127,9 +140,20 @@ function createChannelModal(currentServer, after) {
       label: 'Root Message',
       placeholder: 'Welcome to the new channel',
     },
-  ], 'Create', () => {
-    if (after) {
-      after();
+  ], 'Create', async (inputValues) => {
+    const newName = inputValues[1];
+    const newDesc = inputValues[2];
+    const newRoot = inputValues[3];
+
+    const channelKey = await FirestoreUser.createNewChannel(
+      currentServer.serverKey,
+      newName,
+      newDesc,
+      newRoot,
+    );
+
+    if (changeToChannel) {
+      changeToChannel(currentServer.serverKey, channelKey);
     }
   });
 }
