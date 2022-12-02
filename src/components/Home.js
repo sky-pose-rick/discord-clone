@@ -246,6 +246,7 @@ function Home() {
           <span className="symbolled">{currentChannel.channelName}</span>
           <div className="line" />
           <span className="channel-desc">{currentChannel.channelDesc}</span>
+          {(currentServer.owner === currentUser.uid) && (
           <button
             className="edit-server"
             type="button"
@@ -255,6 +256,7 @@ function Home() {
           >
             Edit Server
           </button>
+          )}
           {/* <button
             className="delete-server"
             type="button"
@@ -264,6 +266,7 @@ function Home() {
           >
             Delete Server
           </button> */}
+          {(currentServer.owner === currentUser.uid) && (
           <button
             className="edit-channel"
             type="button"
@@ -273,6 +276,8 @@ function Home() {
           >
             Edit Channel
           </button>
+          )}
+          {(currentServer.owner === currentUser.uid) && (
           <button
             className="delete-channel"
             type="button"
@@ -288,9 +293,11 @@ function Home() {
           >
             Delete Channel
           </button>
+          )}
         </div>
       </HeaderBar>
       <ChannelNav>
+        {(currentServer.owner === currentUser.uid) && (
         <button
           className="create-channel"
           type="button"
@@ -302,6 +309,7 @@ function Home() {
         >
           Create Channel
         </button>
+        )}
         {channels.map((channel) => (
           <Link
             to={`/discord-clone/server/${serverKey}/${channel.channelKey}`}

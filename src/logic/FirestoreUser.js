@@ -237,6 +237,7 @@ function subscribeToServers(onReplaceServerList) {
             iconURL: serverData.iconURL,
             altText: serverData.name.slice(0, 3).toUpperCase(),
             defaultChannel: serverData.defaultChannel,
+            owner: serverData.owner,
           };
           serverList.push(newServer);
           // call here because foreach loop is not waited for
@@ -407,6 +408,7 @@ async function createNewServer(owner, name, icon) {
   const serverRef = await addDoc(collection(db, 'servers'), {
     name,
     iconURL: 'IMAGE_NOT_FOUND',
+    owner: owner.uid,
   });
 
   // update user's server list
