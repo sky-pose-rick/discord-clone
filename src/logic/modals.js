@@ -105,16 +105,30 @@ function editChannelModal(currentChannel, after) {
   });
 }
 
-function deleteChannelModal(currentChannel, after) {
+async function deleteChannelModal(currentChannel, channels, changeToChannel) {
   createModal([
     {
       type: 'label',
       label: 'Delete Channel?',
       placeholder: 'none',
     },
+    {
+      type: 'label',
+      label: 'Note: The last channel cannot be deleted.',
+      placeholder: 'none',
+    },
   ], 'Confirm', () => {
-    if (after) {
-      after();
+    if (channels.length > 1) {
+      const nextChannelKey = (channels[0].channelKey === currentChannel.channelKey)
+        ? channels[1].channelKey : channels[0].channelKey;
+
+      FirestoreUser.deleteChannel(currentChannel.serverKey, currentChannel.channelKey);
+
+      if (changeToChannel) {
+        changeToChannel(currentChannel.serverKey, nextChannelKey);
+      }
+    } else {
+      console.error('Cannot delete last channel in server');
     }
   });
 }

@@ -1,6 +1,6 @@
 import {
   getFirestore, collection, getDocs, query, orderBy, limit, onSnapshot,
-  addDoc, updateDoc, doc, setDoc, getDoc, serverTimestamp, startAfter,
+  addDoc, updateDoc, doc, setDoc, getDoc, serverTimestamp, startAfter, deleteDoc,
 } from 'firebase/firestore';
 
 import {
@@ -397,6 +397,11 @@ async function updateChannel(serverKey, channelKey, name, desc, root) {
   });
 }
 
+async function deleteChannel(serverKey, channelKey) {
+  const channelDoc = makeChannelDoc(serverKey, channelKey);
+  deleteDoc(channelDoc);
+}
+
 async function createNewServer(owner, name, icon) {
   // create a new document
   const serverRef = await addDoc(collection(db, 'servers'), {
@@ -471,4 +476,5 @@ export default {
   updateChannel,
   createNewChannel,
   updateServer,
+  deleteChannel,
 };

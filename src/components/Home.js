@@ -277,7 +277,13 @@ function Home() {
             className="delete-channel"
             type="button"
             onClick={() => {
-              modals.deleteChannelModal(currentChannel);
+              modals.deleteChannelModal(
+                currentChannel,
+                channels,
+                (nextServerkey, nextChannelKey) => {
+                  navigate(`/discord-clone/server/${nextServerkey}/${nextChannelKey}`);
+                },
+              );
             }}
           >
             Delete Channel
