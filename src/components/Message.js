@@ -29,6 +29,8 @@ const ImageWrapper = styled.div`{
 
 const MessageHeader = styled.div`{
   margin-top: 5px;
+  display: flex;
+  align-items: center;
 
   >span{
     color: #5a5d63;
@@ -40,6 +42,16 @@ const MessageHeader = styled.div`{
     font-size: 1em;
     font-weight: bold;
     margin-right: 10px;
+  }
+}`;
+
+const DeleteButton = styled.button`{
+  margin-left: auto;
+  margin-right: 10px;
+  visibility: hidden;
+
+  ${MessageBox}: hover & {
+    visibility: inherit;
   }
 }`;
 
@@ -64,6 +76,11 @@ function Message(props) {
           <MessageHeader>
             <span>{user}</span>
             <span>{timestamp}</span>
+            {isModerator && !deleted && (
+            <DeleteButton type="button" onClick={deleteFunc}>
+              X
+            </DeleteButton>
+            )}
           </MessageHeader>
           <div>
             {deleted && <p>{'<deleted>'}</p>}
@@ -71,11 +88,6 @@ function Message(props) {
               // eslint-disable-next-line react/no-array-index-key
               && linedContent.map((segment, index) => (<p key={index}>{segment}</p>))}
           </div>
-          {isModerator && !deleted && (
-            <button type="button" onClick={deleteFunc}>
-              X
-            </button>
-          )}
         </MessageBox>
         )}
     </div>
