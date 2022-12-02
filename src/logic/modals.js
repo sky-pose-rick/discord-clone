@@ -57,7 +57,6 @@ function deleteServerModal(currentServer, after) {
       placeholder: 'none',
     },
   ], 'Confirm', () => {
-    console.log('Server deletion not allowed');
     if (after) {
       after();
     }
@@ -226,6 +225,25 @@ function deleteMessageModal(currentChannel, message, after) {
   });
 }
 
+function leaveServerModal(currentServer, currentUser, after) {
+  createModal([
+    {
+      type: 'label',
+      label: 'Leave Server?',
+      placeholder: 'none',
+    },
+  ], 'Confirm', async () => {
+    if (currentServer.owner === currentUser.uid) {
+      console.error('Owner cannot leave their own server');
+    } else {
+      await FirestoreUser.leaveServer(currentServer.serverKey, currentUser.uid);
+      if (after) {
+        after();
+      }
+    }
+  });
+}
+
 export default {
   signOutModal,
   editServerModal,
@@ -235,4 +253,5 @@ export default {
   createChannelModal,
   createServerModal,
   deleteMessageModal,
+  leaveServerModal,
 };

@@ -257,7 +257,8 @@ function Home() {
             Edit Server
           </button>
           )}
-          {/* <button
+          {(currentServer.owner === currentUser.uid) && (
+          <button
             className="delete-server"
             type="button"
             onClick={() => {
@@ -265,7 +266,22 @@ function Home() {
             }}
           >
             Delete Server
-          </button> */}
+          </button>
+          ) }
+          {(currentServer.owner !== currentUser.uid) && (
+          <button
+            className="leave-server"
+            type="button"
+            onClick={() => {
+              modals.leaveServerModal(currentServer, currentUser, () => {
+                // TODO: re-direct to a non-server page
+                navigate(`/discord-clone/server/${servers[0].serverKey}/${servers[0].defaultChannel}`);
+              });
+            }}
+          >
+            Leave Server
+          </button>
+          ) }
           {(currentServer.owner === currentUser.uid) && (
           <button
             className="edit-channel"

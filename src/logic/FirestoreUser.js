@@ -414,6 +414,9 @@ async function createNewServer(owner, name, icon) {
   // update user's server list
   await setDoc(doc(db, 'users', owner.uid, 'servers', serverRef.id), {});
 
+  // update server's user list
+  await setDoc(doc(serverRef, 'users', owner.uid), {});
+
   // create a welcome channel
   const channelID = await createNewChannel(serverRef.id, 'Welcome', 'The welcome channel', 'Welcome to the server');
 
@@ -462,6 +465,16 @@ async function updateServer(serverKey, name, icon) {
   }
 }
 
+async function leaveServer(serverKey, userKey) {
+  // remove user from server
+  const userInServer = doc(db, 'servers', serverKey, 'users', userKey);
+  await deleteDoc(userInServer);
+
+  // remove server from user
+  const serverInUser = doc(db, 'users', userKey, 'servers', serverKey);
+  await deleteDoc(serverInUser);
+}
+
 export default {
   sendMessage,
   deleteMessage,
@@ -479,4 +492,5 @@ export default {
   createNewChannel,
   updateServer,
   deleteChannel,
+  leaveServer,
 };
