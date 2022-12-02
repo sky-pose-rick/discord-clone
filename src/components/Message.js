@@ -45,7 +45,7 @@ const MessageHeader = styled.div`{
 
 function Message(props) {
   const {
-    user, timestamp, content, deleted, isRoot,
+    user, timestamp, content, deleted, isRoot, isModerator, deleteFunc,
   } = props;
 
   const linedContent = content.split('\n');
@@ -71,6 +71,11 @@ function Message(props) {
               // eslint-disable-next-line react/no-array-index-key
               && linedContent.map((segment, index) => (<p key={index}>{segment}</p>))}
           </div>
+          {isModerator && !deleted && (
+            <button type="button" onClick={deleteFunc}>
+              X
+            </button>
+          )}
         </MessageBox>
         )}
     </div>
@@ -83,6 +88,8 @@ Message.propTypes = {
   content: propTypes.string,
   deleted: propTypes.bool,
   isRoot: propTypes.bool,
+  isModerator: propTypes.bool,
+  deleteFunc: propTypes.func,
 };
 
 Message.defaultProps = {
@@ -91,6 +98,8 @@ Message.defaultProps = {
   content: 'missing',
   deleted: false,
   isRoot: false,
+  isModerator: false,
+  deleteFunc: () => {},
 };
 
 export default Message;

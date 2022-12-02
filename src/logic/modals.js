@@ -57,6 +57,7 @@ function deleteServerModal(currentServer, after) {
       placeholder: 'none',
     },
   ], 'Confirm', () => {
+    console.log('Server deletion not allowed');
     if (after) {
       after();
     }
@@ -187,6 +188,30 @@ function createServerModal(currentUser, changeToServer) {
   });
 }
 
+function deleteMessageModal(currentChannel, message, after) {
+  createModal([
+    {
+      type: 'label',
+      label: 'Delete Message?',
+      placeholder: 'none',
+    },
+    {
+      type: 'label',
+      label: `${message.user}: ${message.content}`,
+      placeholder: 'none',
+    },
+  ], 'Confirm', () => {
+    FirestoreUser.deleteMessage(
+      currentChannel.serverKey,
+      currentChannel.channelKey,
+      message.messageKey,
+    );
+    if (after) {
+      after();
+    }
+  });
+}
+
 export default {
   signOutModal,
   editServerModal,
@@ -195,4 +220,5 @@ export default {
   deleteChannelModal,
   createChannelModal,
   createServerModal,
+  deleteMessageModal,
 };

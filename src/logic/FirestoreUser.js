@@ -75,6 +75,7 @@ async function loadMoreMessages() {
         timestamp: `${data.timestamp.seconds} `,
         content: data.content,
         messageKey: message.id,
+        deleted: !!message.deleted,
       };
       displayMessage(newMessage, true);
     });
@@ -112,13 +113,16 @@ async function sendMessage(message) {
   await addDoc(messageColl, messageObj);
 }
 
-function deleteMessage(key) {
-  if (!messageSubscriber) {
-    console.error('Missing message subscriber');
-    return;
-  }
+async function deleteMessage(serverKey, channelKey, messageKey) {
+  const channelDoc = makeChannelDoc(serverKey, channelKey);
+  const messageDoc = doc(channelDoc, 'messages', messageKey);
 
-  messageSubscriber.onDeleteMessage(key);
+  await updateDoc(messageDoc, {
+    content: '',
+    deleted: 'true',
+  });
+
+  messageSubscriber.onDeleteMessage(messageKey);
 }
 
 function unSubscribeToMessages() {
@@ -163,6 +167,7 @@ async function subscribeToMessages(
           user: data.user,
           timestamp: (data.timestamp) ? `${data.timestamp.seconds} ` : 'now',
           content: data.content,
+          deleted: !!data.deleted,
           messageKey: change.doc.id,
         };
 
@@ -184,7 +189,7 @@ async function subscribeToMessages(
       }
       if (change.type === 'modified') {
         // test if this message is flagged as deleted
-        if (change.doc.data.content === 'deleted') {
+        if (change.doc.data.deleted) {
           onDeleteMessage(change.doc.id);
         }
       }

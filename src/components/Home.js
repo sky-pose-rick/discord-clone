@@ -255,7 +255,7 @@ function Home() {
           >
             Edit Server
           </button>
-          <button
+          {/* <button
             className="delete-server"
             type="button"
             onClick={() => {
@@ -263,7 +263,7 @@ function Home() {
             }}
           >
             Delete Server
-          </button>
+          </button> */}
           <button
             className="edit-channel"
             type="button"
@@ -326,6 +326,10 @@ function Home() {
               deleted={message.deleted}
               key={message.messageKey}
               isRoot={message.isRoot}
+              isModerator
+              deleteFunc={() => {
+                modals.deleteMessageModal(currentChannel, message);
+              }}
             />
           ))
         }
