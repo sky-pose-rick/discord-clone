@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import propTypes from 'prop-types';
 import styled from 'styled-components';
+import FirestoreUser from '../logic/FirestoreUser';
 
 const MessageBox = styled.div`{
   display: grid;
@@ -60,6 +61,19 @@ function Message(props) {
     user, timestamp, content, deleted, isRoot, isModerator, deleteFunc,
   } = props;
 
+  const [userDetails, setUserDetails] = useState({
+    uid: 0,
+    name: 'Loading',
+    icon: 'blank.png',
+  });
+
+  if (!isRoot) {
+    // useEffect stops re-renders
+    useEffect(() => {
+      FirestoreUser.getUserDetails(user, setUserDetails);
+    }, []);
+  }
+
   const linedContent = content.split('\n');
   const displayDate = new Date();
   displayDate.setTime(timestamp);
@@ -73,10 +87,10 @@ function Message(props) {
         && (
         <MessageBox>
           <ImageWrapper>
-            <div />
+            <img src={userDetails.icon} alt="U" />
           </ImageWrapper>
           <MessageHeader>
-            <span>{user}</span>
+            <span>{userDetails.name}</span>
             <span>{displayDate.toString()}</span>
             {isModerator && !deleted && (
             <DeleteButton type="button" onClick={deleteFunc}>

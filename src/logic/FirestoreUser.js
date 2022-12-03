@@ -24,9 +24,43 @@ let messageCursor = null;
 let rootShown = false;
 const messagesToFetch = 12;
 
-function getUserDetails(user) {
-  // fetch user from firestore
+const users = {};
 
+// only fetch user details from firestore once
+// could be replaced with snapshot listeners to watch for name/photo changes
+async function getUserDetails(user, setUser) {
+  if (users[user]) { // seen before
+    users[user].promise.then((value) => {
+      setUser(value);
+    });
+  } else { // not seen before
+    users[user] = {
+      // eslint-disable-next-line no-async-promise-executor
+      promise: new Promise(async (resolve) => {
+        const userDoc = await getDoc(doc(db, 'users', user));
+
+        console.log('from firestore', userDoc);
+        const userData = userDoc.data();
+        if (userData) {
+          const newUser = {
+            uid: user,
+            name: userData.displayName,
+            icon: userData.iconURL,
+          };
+          setUser(newUser);
+          resolve(newUser);
+        } else {
+          const newUser = {
+            uid: user,
+            name: 'Missing',
+            icon: 'blank.png',
+          };
+          setUser(newUser);
+          resolve(newUser);
+        }
+      }),
+    };
+  }
 }
 
 function makeChannelDoc(serverKey, channelKey) {
@@ -488,4 +522,5 @@ export default {
   updateServer,
   deleteChannel,
   leaveServer,
+  getUserDetails,
 };
