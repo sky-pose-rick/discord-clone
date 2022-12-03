@@ -61,6 +61,8 @@ function Message(props) {
   } = props;
 
   const linedContent = content.split('\n');
+  const displayDate = new Date();
+  displayDate.setTime(timestamp);
 
   // TODO: remove username and image for consecutive messages
   return (
@@ -75,7 +77,7 @@ function Message(props) {
           </ImageWrapper>
           <MessageHeader>
             <span>{user}</span>
-            <span>{timestamp}</span>
+            <span>{displayDate.toString()}</span>
             {isModerator && !deleted && (
             <DeleteButton type="button" onClick={deleteFunc}>
               X
@@ -96,7 +98,7 @@ function Message(props) {
 
 Message.propTypes = {
   user: propTypes.string,
-  timestamp: propTypes.string,
+  timestamp: propTypes.number,
   content: propTypes.string,
   deleted: propTypes.bool,
   isRoot: propTypes.bool,
@@ -106,7 +108,7 @@ Message.propTypes = {
 
 Message.defaultProps = {
   user: 'missing',
-  timestamp: 'missing',
+  timestamp: 0,
   content: 'missing',
   deleted: false,
   isRoot: false,

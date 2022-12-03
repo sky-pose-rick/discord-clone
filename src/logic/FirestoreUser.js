@@ -42,7 +42,7 @@ function displayMessage(message, appendToStart) {
     console.error('Missing message subscriber');
     return;
   }
-  if (!message.content) {
+  if (!message.content && !message.deleted) {
     console.error('Blank message submitted');
     return;
   }
@@ -69,10 +69,9 @@ async function loadMoreMessages() {
     const messagesFetched = messageBatch.docs.length;
     messageBatch.forEach((message) => {
       const data = message.data();
-      // console.log(data.timestamp);
       const newMessage = {
         user: data.user,
-        timestamp: `${data.timestamp.seconds} `,
+        timestamp: data.timestamp.toMillis(),
         content: data.content,
         messageKey: message.id,
         deleted: !!message.deleted,
@@ -165,7 +164,7 @@ async function subscribeToMessages(
         const data = change.doc.data();
         const newMessage = {
           user: data.user,
-          timestamp: (data.timestamp) ? `${data.timestamp.seconds} ` : 'now',
+          timestamp: (data.timestamp) ? `${data.timestamp.toMillis()} ` : Date.now(),
           content: data.content,
           deleted: !!data.deleted,
           messageKey: change.doc.id,
@@ -173,12 +172,8 @@ async function subscribeToMessages(
 
         // compare to message cursor
         if (messageCursor) {
-          const cursorTimestamp = messageCursor.data().timestamp;
-          const newTimestamp = data.timestamp;
-          if (newTimestamp
-            && ((cursorTimestamp.seconds === newTimestamp.seconds
-                && cursorTimestamp.nanoseconds > newTimestamp.nanoseconds)
-              || (cursorTimestamp.seconds > newTimestamp.seconds))) {
+          const cursorTimestamp = messageCursor.data().timestamp.toMillis();
+          if (data.timestamp && cursorTimestamp > data.timestamp.toMillis()) {
             messageCursor = change.doc;
             onNewMessage(newMessage, true);
           } else { onNewMessage(newMessage, false); }
