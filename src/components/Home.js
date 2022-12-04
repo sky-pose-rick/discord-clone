@@ -8,7 +8,6 @@ import ServerIcon from './ServerIcon';
 import Message from './Message';
 import FirestoreUser from '../logic/FirestoreUser';
 import FirebaseAuthUser from '../logic/FirebaseAuthUser';
-import modalService from '../logic/modalService';
 import modals from '../logic/modals';
 
 import ServerStyles from '../component-styles/ServerStyles';
@@ -262,7 +261,10 @@ function Home() {
             className="delete-server"
             type="button"
             onClick={() => {
-              modals.deleteServerModal(currentServer);
+              modals.deleteServerModal(currentServer, () => {
+                // TODO: re-direct to a non-server page
+                navigate(`/discord-clone/server/${servers[0].serverKey}/${servers[0].defaultChannel}`);
+              });
             }}
           >
             Delete Server
@@ -310,6 +312,17 @@ function Home() {
             Delete Channel
           </button>
           )}
+          <button
+            className="signout"
+            type="button"
+            onClick={() => {
+              modals.signOutModal(() => {
+                navigate('/discord-clone/login');
+              });
+            }}
+          >
+            Log Out
+          </button>
         </div>
       </HeaderBar>
       <ChannelNav>

@@ -76,6 +76,11 @@ const HeaderBar = styled.div`{
     border-left: solid 1px gray;
     height: 50%;
   }
+
+  .signout{
+    margin-left: auto;
+    margin-right: 1em;
+  }
 }`;
 
 const ChannelNav = styled.nav`{
