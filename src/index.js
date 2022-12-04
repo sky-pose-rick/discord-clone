@@ -18,7 +18,7 @@ ReactDOM.render(
   FirestoreUser.pushFakeContent();
 }, 750); */
 
-let counter = 0;
+/* let counter = 0;
 
 document.addEventListener('keyup', (e) => {
   if (e.code === 'Numpad7') {
@@ -44,4 +44,4 @@ document.addEventListener('keyup', (e) => {
     // console.log(textContent);
     FirebaseAuthUser.logoutUser();
   }
-});
+}); */
