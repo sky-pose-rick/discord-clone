@@ -26,23 +26,14 @@ async function isSignedIn() {
   return user;
 }
 
-function registerUser(userDetails, onSignIn) {
+async function registerUser(userDetails, onSignIn) {
   const { email, password } = userDetails;
-  createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed in
-      console.log('user created', email);
-      user = userCredential.user;
-      updateProfile(user, { displayName: userDetails.username });
-      if (onSignIn) { onSignIn(user); }
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.error(errorCode, errorMessage);
-    });
+  // create user in authentication
+  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  user = userCredential.user;
+  await updateProfile(user, { displayName: userDetails.username });
 
-  if (onSignIn) { onSignIn(user); }
+  if (onSignIn) { onSignIn({ uid: user.uid, displayName: userDetails.username }); }
 }
 
 function signInUser(email, password, onSignIn) {

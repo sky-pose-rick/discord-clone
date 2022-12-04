@@ -14,6 +14,7 @@ import fakeStorage from './fakeStorage';
 import FirebaseAuthUser from './FirebaseAuthUser';
 
 const db = getFirestore();
+const defaultUserIcon = 'blank.png';
 
 let messageSubscriber = null;
 let serverSubscriber = null;
@@ -33,8 +34,14 @@ async function getSelf() {
   return {
     uid: selfAuth.uid,
     displayName: selfData.displayName,
-    icon: selfData.iconURL,
+    icon: selfData.iconURL || defaultUserIcon,
   };
+}
+
+async function createNewUser(uid, name) {
+  await setDoc(doc(db, 'users', uid), {
+    displayName: name,
+  });
 }
 
 // only fetch user details from firestore once
@@ -54,7 +61,7 @@ async function getUserDetails(user, setUser) {
           const newUser = {
             uid: user,
             name: userData.displayName,
-            icon: userData.iconURL,
+            icon: userData.iconURL || defaultUserIcon,
           };
           setUser(newUser);
           resolve(newUser);
@@ -579,4 +586,5 @@ export default {
   deleteServer,
   getSelf,
   updateUser,
+  createNewUser,
 };

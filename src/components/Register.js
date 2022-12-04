@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import RegisterStyles from '../component-styles/RegisterStyles';
 import FirebaseAuthUser from '../logic/FirebaseAuthUser';
+import FirestoreUser from '../logic/FirestoreUser';
 
 const {
   FormBox,
@@ -34,7 +35,11 @@ function Register() {
       birthday: `${month}-${day}-${year}`,
     };
 
-    FirebaseAuthUser.registerUser(userDetails, () => {
+    // create user in auth
+    FirebaseAuthUser.registerUser(userDetails, async (newUser) => {
+      // create user in firestore
+      await FirestoreUser.createNewUser(newUser.uid, newUser.displayName);
+      // TODO: navigate to neutral location
       navigate('/discord-clone/server/server1/channel1');
     });
   };

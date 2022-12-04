@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import FirestoreUser from './logic/FirestoreUser';
+// import FirestoreUser from './logic/FirestoreUser';
 
 import './styles/index.css';
 import App from './App';
-import FirebaseAuthUser from './logic/FirebaseAuthUser';
+// import FirebaseAuthUser from './logic/FirebaseAuthUser';
 
 ReactDOM.render(
   <React.StrictMode>
