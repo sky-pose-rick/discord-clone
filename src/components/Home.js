@@ -24,63 +24,67 @@ const {
   UserList,
 } = ServerStyles;
 
-function useMessages(channelKey, mainRef) {
+function useMessages(channelKey, mainRef, willShowContent) {
   const [messages, setMessages] = useState([]);
 
   // useEffect needs to be called when state changes in order to update callback
   useEffect(() => {
-    const onNewMessage = (message, appendToStart) => {
-      const main = mainRef.current;
-      const willScroll = main.scrollHeight - main.scrollTop - main.clientHeight < 60;
+    if (willShowContent) {
+      const onNewMessage = (message, appendToStart) => {
+        const main = mainRef.current;
+        const willScroll = main.scrollHeight - main.scrollTop - main.clientHeight < 60;
 
-      setMessages((prev) => {
+        setMessages((prev) => {
         // spread to flag a re-render
-        const newArray = [...prev];
-        if (appendToStart) {
-          newArray.unshift(message);
-        } else {
-          newArray.push(message);
-        }
-        return newArray;
-      });
-
-      // scroll to bottom
-      if (willScroll && !appendToStart) {
-        main.scroll({ top: main.scrollHeight, behavior: 'instant' });
-      }
-    };
-
-    const onDeleteMessage = (key) => {
-      // don't need to update message content
-      setMessages((prev) => {
-        const index = prev.findIndex((message) => key === message.messageKey);
-        if (index > -1) {
-          // spread to flag a re-render
           const newArray = [...prev];
-          const newMessage = { ...prev[index] };
-          newMessage.deleted = true;
-          newArray[index] = newMessage;
+          if (appendToStart) {
+            newArray.unshift(message);
+          } else {
+            newArray.push(message);
+          }
           return newArray;
+        });
+
+        // scroll to bottom
+        if (willScroll && !appendToStart) {
+          main.scroll({ top: main.scrollHeight, behavior: 'instant' });
         }
-        // if message is not found, make no changes
-        return prev;
-      });
-    };
-    const onChangeMessage = () => {};
-    const onClearMessages = () => { setMessages([]); };
+      };
 
-    FirestoreUser.subscribeToMessages(
-      channelKey,
-      onNewMessage,
-      onChangeMessage,
-      onDeleteMessage,
-      onClearMessages,
-    );
+      const onDeleteMessage = (key) => {
+      // don't need to update message content
+        setMessages((prev) => {
+          const index = prev.findIndex((message) => key === message.messageKey);
+          if (index > -1) {
+          // spread to flag a re-render
+            const newArray = [...prev];
+            const newMessage = { ...prev[index] };
+            newMessage.deleted = true;
+            newArray[index] = newMessage;
+            return newArray;
+          }
+          // if message is not found, make no changes
+          return prev;
+        });
+      };
+      const onChangeMessage = () => {};
+      const onClearMessages = () => { setMessages([]); };
 
-    return () => {
-      FirestoreUser.unSubscribeToMessages();
-    };
-  }, [channelKey]);
+      FirestoreUser.subscribeToMessages(
+        channelKey,
+        onNewMessage,
+        onChangeMessage,
+        onDeleteMessage,
+        onClearMessages,
+      );
+
+      return () => {
+        FirestoreUser.unSubscribeToMessages();
+      };
+    }
+    setMessages([]);
+    return () => {};
+  }, [channelKey, willShowContent]);
 
   return messages;
 }
@@ -104,7 +108,7 @@ function useServers() {
   return servers;
 }
 
-function useChannels(serverKey) {
+function useChannels(serverKey, willShowContent) {
   const [channels, setChannels] = useState([]);
 
   const onReplaceChannelList = (list) => {
@@ -113,12 +117,16 @@ function useChannels(serverKey) {
   };
 
   useEffect(() => {
-    FirestoreUser.subscribeToChannels(serverKey, onReplaceChannelList);
+    if (willShowContent) {
+      FirestoreUser.subscribeToChannels(serverKey, onReplaceChannelList);
 
-    return () => {
-      FirestoreUser.unSubscribeToChannels();
-    };
-  }, [serverKey]);
+      return () => {
+        FirestoreUser.unSubscribeToChannels();
+      };
+    }
+    setChannels([]);
+    return () => {};
+  }, [serverKey, willShowContent]);
 
   return channels;
 }
@@ -166,8 +174,12 @@ function textSubmit(e) {
   }
 }
 
-function useMouseWheel(mainRef) {
+function useMouseWheel(mainRef, willShowContent) {
   const [ticking, setTicking] = useState(false);
+
+  if (!willShowContent) {
+    return () => {};
+  }
 
   const onWheel = () => {
     if (!ticking) {
@@ -195,25 +207,66 @@ function useMouseWheel(mainRef) {
 function Home() {
   const params = useParams();
   const { serverKey, channelKey } = params;
+  let isNeutral = !channelKey || !serverKey || serverKey === '@me';
+  const isBrowser = serverKey === '@browse';
   const mainRef = useRef();
 
   const servers = useServers();
-  const channels = useChannels(serverKey);
-  const messages = useMessages(channelKey, mainRef);
+  if (servers.length === 0) {
+    isNeutral = true;
+  }
+  const channels = useChannels(serverKey, !(isNeutral || isBrowser));
+  if (channels.length === 0) {
+    isNeutral = true;
+  }
+  const messages = useMessages(channelKey, mainRef, !(isNeutral || isBrowser));
   const currentUser = useUser();
 
-  const currentServer = servers.find((server) => server.serverKey === serverKey) || {};
-  const currentChannel = channels.find((channel) => channel.channelKey === channelKey) || {};
+  const willShowContent = !(isNeutral || isBrowser);
+
+  let currentServer = servers.find((server) => server.serverKey === serverKey) || {};
+  if (isBrowser) {
+    currentServer = {
+      serverKey: 'dummy-server',
+      serverName: 'Browse',
+    };
+  } else if (isNeutral) {
+    currentServer = {
+      serverKey: 'dummy-server',
+      serverName: 'Home',
+    };
+  }
+  let currentChannel = channels.find((channel) => channel.channelKey === channelKey) || {};
+  if (isBrowser) {
+    currentChannel = {
+      channelKey: 'dummy-server',
+      channelName: 'Browse',
+      channelDesc: 'Join an existing server',
+    };
+  } else if (isNeutral) {
+    currentChannel = {
+      channelKey: 'dummy-server',
+      channelName: 'Home',
+      channelDesc: 'Your home page',
+    };
+  }
 
   const navigate = useNavigate();
-  const onContentScroll = useMouseWheel(mainRef);
+  const onContentScroll = useMouseWheel(mainRef, willShowContent);
   // console.log('render: ', messages);
   // console.log(currentUser);
 
   return (
     <ServerFrame>
       <ServerNav>
-        <ServerIcon serverName="Home" src="gone" alt="@me" />
+        <Link
+          to="/discord-clone/server/@me"
+          aria-current={isNeutral && !isBrowser}
+          key="@me"
+        >
+          <ServerIcon serverName="Home" src="gone" alt="@me" />
+        </Link>
+
         <div className="line" />
         {servers.map((server) => (
           <Link
@@ -244,7 +297,13 @@ function Home() {
             alt="create"
           />
         </div>
-        <ServerIcon serverName="Find Server" src="gone" alt="browse" />
+        <Link
+          to="/discord-clone/server/@browse"
+          aria-current={isBrowser}
+          key="@browse"
+        >
+          <ServerIcon serverName="Find Server" src="gone" alt="Browse" />
+        </Link>
       </ServerNav>
       <HeaderBar>
         <div className="server-bar">{currentServer.serverName}</div>
@@ -252,7 +311,7 @@ function Home() {
           <span className="symbolled">{currentChannel.channelName}</span>
           <div className="line" />
           <span className="channel-desc">{currentChannel.channelDesc}</span>
-          {(currentServer.owner === currentUser.uid) && (
+          {willShowContent && (currentServer.owner === currentUser.uid) && (
           <button
             className="edit-server"
             type="button"
@@ -263,35 +322,33 @@ function Home() {
             Edit Server
           </button>
           )}
-          {(currentServer.owner === currentUser.uid) && (
+          {willShowContent && (currentServer.owner === currentUser.uid) && (
           <button
             className="delete-server"
             type="button"
             onClick={() => {
               modals.deleteServerModal(currentServer, () => {
-                // TODO: re-direct to a non-server page
-                navigate(`/discord-clone/server/${servers[0].serverKey}/${servers[0].defaultChannel}`);
+                navigate('/discord-clone/server/@me');
               });
             }}
           >
             Delete Server
           </button>
           ) }
-          {(currentServer.owner !== currentUser.uid) && (
+          {willShowContent && (currentServer.owner !== currentUser.uid) && (
           <button
             className="leave-server"
             type="button"
             onClick={() => {
               modals.leaveServerModal(currentServer, currentUser, () => {
-                // TODO: re-direct to a non-server page
-                navigate(`/discord-clone/server/${servers[0].serverKey}/${servers[0].defaultChannel}`);
+                navigate('/discord-clone/server/@me');
               });
             }}
           >
             Leave Server
           </button>
           ) }
-          {(currentServer.owner === currentUser.uid) && (
+          {willShowContent && (currentServer.owner === currentUser.uid) && (
           <button
             className="edit-channel"
             type="button"
@@ -302,7 +359,7 @@ function Home() {
             Edit Channel
           </button>
           )}
-          {(currentServer.owner === currentUser.uid) && (
+          {willShowContent && (currentServer.owner === currentUser.uid) && (
           <button
             className="delete-channel"
             type="button"
@@ -367,6 +424,7 @@ function Home() {
         <img src={currentUser.icon} alt="U" />
         <span>{currentUser.displayName}</span>
       </UserPanel>
+      {willShowContent && (
       <MainContent onWheelCapture={onContentScroll} ref={mainRef}>
         {
           messages.map((message) => (
@@ -385,11 +443,14 @@ function Home() {
           ))
         }
       </MainContent>
+      )}
+      {willShowContent && (
       <InputBox>
         <textarea type="text" placeholder={`Message #${currentChannel.channelName}`} onKeyUp={textSubmit} />
       </InputBox>
+      )}
       <UserList>
-        UserList
+        {willShowContent && <div>UserList</div>}
       </UserList>
     </ServerFrame>
   );

@@ -40,7 +40,7 @@ function Register() {
       // create user in firestore
       await FirestoreUser.createNewUser(newUser.uid, newUser.displayName);
       // TODO: navigate to neutral location
-      navigate('/discord-clone/server/server1/channel1');
+      navigate('/discord-clone/server/@me');
     });
   };
 
