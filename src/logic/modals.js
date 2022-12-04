@@ -262,10 +262,15 @@ function editUserModal(user, after) {
       label: 'Change Icon?',
       placeholder: '',
     },
-  ], 'Save', (inputValues) => {
-    FirestoreUser.updateUser(user.uid, inputValues[1], inputValues[2]);
+  ], 'Save', async (inputValues) => {
+    const newDetails = await FirestoreUser.updateUser(user.uid, inputValues[1], inputValues[2]);
+    const newUser = {
+      uid: user.uid,
+      displayName: newDetails.displayName,
+      icon: newDetails.icon || user.icon,
+    };
     if (after) {
-      after();
+      after(newUser);
     }
   });
 }

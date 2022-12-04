@@ -138,7 +138,10 @@ function useUser() {
     });
   }, []);
 
-  return user;
+  return {
+    ...user,
+    setUser,
+  };
 }
 
 function textSubmit(e) {
@@ -356,7 +359,9 @@ function Home() {
         ))}
       </ChannelNav>
       <UserPanel onClick={() => {
-        modals.editUserModal(currentUser);
+        modals.editUserModal(currentUser, (updatedUser) => {
+          currentUser.setUser(updatedUser);
+        });
       }}
       >
         <img src={currentUser.icon} alt="U" />

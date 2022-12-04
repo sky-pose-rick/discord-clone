@@ -520,11 +520,19 @@ async function updateUser(userKey, name, icon) {
       iconURL: publicImageURL,
       storageUri: imageSnapshot.metadata.fullPath,
     });
-  } else {
-    await updateDoc(userRef, {
+    return {
+      uid: userKey,
+      icon: publicImageURL,
       displayName: name,
-    });
+    };
   }
+  await updateDoc(userRef, {
+    displayName: name,
+  });
+  return {
+    uid: userKey,
+    displayName: name,
+  };
 }
 
 async function leaveServer(serverKey, userKey) {
