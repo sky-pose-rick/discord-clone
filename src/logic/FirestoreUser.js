@@ -26,6 +26,17 @@ const messagesToFetch = 12;
 
 const users = {};
 
+async function getSelf() {
+  const selfAuth = await FirebaseAuthUser.getUserAuth();
+  const selfDoc = await getDoc(doc(db, 'users', selfAuth.uid));
+  const selfData = selfDoc.data();
+  return {
+    uid: selfAuth.uid,
+    displayName: selfData.displayName,
+    icon: selfData.iconURL,
+  };
+}
+
 // only fetch user details from firestore once
 // could be replaced with snapshot listeners to watch for name/photo changes
 async function getUserDetails(user, setUser) {
@@ -38,8 +49,6 @@ async function getUserDetails(user, setUser) {
       // eslint-disable-next-line no-async-promise-executor
       promise: new Promise(async (resolve) => {
         const userDoc = await getDoc(doc(db, 'users', user));
-
-        console.log('from firestore', userDoc);
         const userData = userDoc.data();
         if (userData) {
           const newUser = {
@@ -494,6 +503,30 @@ async function updateServer(serverKey, name, icon) {
   }
 }
 
+async function updateUser(userKey, name, icon) {
+  const userRef = doc(db, 'users', userKey);
+
+  if (icon) {
+    // upload new image to storage
+    const imageRef = ref(getStorage(), `${userKey}/${icon.name}`);
+    const imageSnapshot = await uploadBytesResumable(imageRef, icon);
+
+    // public url for image
+    const publicImageURL = await getDownloadURL(imageRef);
+
+    // update server document
+    await updateDoc(userRef, {
+      displayName: name,
+      iconURL: publicImageURL,
+      storageUri: imageSnapshot.metadata.fullPath,
+    });
+  } else {
+    await updateDoc(userRef, {
+      displayName: name,
+    });
+  }
+}
+
 async function leaveServer(serverKey, userKey) {
   // remove user from server
   const userInServer = doc(db, 'servers', serverKey, 'users', userKey);
@@ -536,4 +569,6 @@ export default {
   leaveServer,
   getUserDetails,
   deleteServer,
+  getSelf,
+  updateUser,
 };

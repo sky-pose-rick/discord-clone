@@ -124,10 +124,14 @@ function useChannels(serverKey) {
 }
 
 function useUser() {
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState({
+    displayName: 'Loading',
+    iconURL: 'missing',
+    uid: 0,
+  });
 
   useEffect(() => {
-    const userPromise = FirebaseAuthUser.getUserAuth();
+    const userPromise = FirestoreUser.getSelf();
 
     userPromise.then((data) => {
       setUser(data);
@@ -352,12 +356,11 @@ function Home() {
         ))}
       </ChannelNav>
       <UserPanel onClick={() => {
-        modals.signOutModal(() => {
-          navigate('/discord-clone/login');
-        });
+        modals.editUserModal(currentUser);
       }}
       >
-        { currentUser && currentUser.displayName }
+        <img src={currentUser.icon} alt="U" />
+        <span>{currentUser.displayName}</span>
       </UserPanel>
       <MainContent onWheelCapture={onContentScroll} ref={mainRef}>
         {

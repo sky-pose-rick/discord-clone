@@ -245,6 +245,31 @@ function leaveServerModal(currentServer, currentUser, after) {
   });
 }
 
+function editUserModal(user, after) {
+  createModal([
+    {
+      type: 'label',
+      label: 'Edit Profile',
+      placeholder: 'none',
+    },
+    {
+      type: 'text',
+      label: 'Name',
+      placeholder: user.displayName,
+    },
+    {
+      type: 'file',
+      label: 'Change Icon?',
+      placeholder: '',
+    },
+  ], 'Save', (inputValues) => {
+    FirestoreUser.updateUser(user.uid, inputValues[1], inputValues[2]);
+    if (after) {
+      after();
+    }
+  });
+}
+
 export default {
   signOutModal,
   editServerModal,
@@ -255,4 +280,5 @@ export default {
   createServerModal,
   deleteMessageModal,
   leaveServerModal,
+  editUserModal,
 };
