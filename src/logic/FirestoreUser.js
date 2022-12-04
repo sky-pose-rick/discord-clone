@@ -504,6 +504,18 @@ async function leaveServer(serverKey, userKey) {
   await deleteDoc(serverInUser);
 }
 
+async function deleteServer(serverKey) {
+  const serverDoc = makeServerDoc(serverKey);
+
+  const server = await getDoc(serverDoc);
+  const { owner } = server.data();
+
+  const serverInUser = doc(db, 'users', owner, 'servers', serverKey);
+
+  await deleteDoc(serverDoc);
+  await deleteDoc(serverInUser);
+}
+
 export default {
   sendMessage,
   deleteMessage,
@@ -523,4 +535,5 @@ export default {
   deleteChannel,
   leaveServer,
   getUserDetails,
+  deleteServer,
 };

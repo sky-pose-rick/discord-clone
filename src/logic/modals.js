@@ -56,7 +56,8 @@ function deleteServerModal(currentServer, after) {
       label: 'Delete Server?',
       placeholder: 'none',
     },
-  ], 'Confirm', () => {
+  ], 'Confirm', async () => {
+    await FirestoreUser.deleteServer(currentServer.serverKey);
     if (after) {
       after();
     }
