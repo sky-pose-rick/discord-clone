@@ -135,10 +135,24 @@ const Channel = styled.div`{
 
 const UserPanel = styled.div`{
   background-color: #2a2b2f;
-  color: white;
   grid-row: 4 / 5;
   grid-column: 2 / 3;
-  height: 40px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+
+  color: white;
+  font-size: 1em;
+  font-weight: bold;
+
+  img{
+    border-radius: 50%;
+    overflow: clip;
+    background-color: red;
+    width: 50px;
+    height: 50px;
+    margin: 0px 20px;
+  }
 }`;
 
 const MainContent = styled.main`{

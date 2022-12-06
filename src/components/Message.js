@@ -19,13 +19,16 @@ const MessageBox = styled.div`{
 }`;
 
 const ImageWrapper = styled.div`{
-  border-radius: 50%;
-  overflow: clip;
-  background-color: red;
-  width: 50px;
-  height: 50px;
+  margin: 10px 20px auto;
   grid-row: 1/3;
-  margin: 0px 20px;
+
+  &>img{
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    background-color: red;
+    overflow: clip;
+  }
 }`;
 
 const MessageHeader = styled.div`{
