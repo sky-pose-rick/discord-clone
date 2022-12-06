@@ -196,22 +196,20 @@ function useMouseWheel(mainRef, willShowContent) {
 function Home() {
   const params = useParams();
   const { serverKey, channelKey } = params;
-  let isNeutral = !channelKey || !serverKey || serverKey === '@me';
+
+  const isHome = serverKey === '@me';
   const isBrowser = serverKey === '@browse';
   const mainRef = useRef();
 
   const servers = useServers();
-  if (servers.length === 0) {
-    isNeutral = true;
-  }
-  const channels = useChannels(serverKey, !(isNeutral || isBrowser));
-  if (channels.length === 0) {
-    isNeutral = true;
-  }
-  const messages = useMessages(channelKey, mainRef, !(isNeutral || isBrowser));
+  const channels = useChannels(serverKey, !(isHome || isBrowser));
+
+  const messages = useMessages(channelKey, mainRef, !(isHome || isBrowser));
   const currentUser = useUser();
 
-  const willShowContent = !(isNeutral || isBrowser);
+  const willShowContent = !(isHome || isBrowser);
+
+  const navigate = useNavigate();
 
   let currentServer = servers.find((server) => server.serverKey === serverKey) || {};
   if (isBrowser) {
@@ -219,11 +217,17 @@ function Home() {
       serverKey: 'dummy-server',
       serverName: 'Browse',
     };
-  } else if (isNeutral) {
+  } else if (isHome) {
     currentServer = {
       serverKey: 'dummy-server',
       serverName: 'Home',
     };
+  } else if (servers.length > 0 && !currentServer.serverKey) {
+    // detect invalid server key
+    // fails if user has left all servers
+
+    // move to @me page
+    navigate('/discord-clone/server/@me');
   }
   let currentChannel = channels.find((channel) => channel.channelKey === channelKey) || {};
   if (isBrowser) {
@@ -232,15 +236,19 @@ function Home() {
       channelName: 'Browse',
       channelDesc: 'Join an existing server',
     };
-  } else if (isNeutral) {
+  } else if (isHome) {
     currentChannel = {
       channelKey: 'dummy-server',
       channelName: 'Home',
       channelDesc: 'Your home page',
     };
+  } else if (channels.length > 0 && !currentChannel.channelKey) {
+    // detect invalid channel key
+
+    // move to first channel
+    navigate(`/discord-clone/server/${currentServer.serverKey}/${channels[0].channelKey}`);
   }
 
-  const navigate = useNavigate();
   const onContentScroll = useMouseWheel(mainRef, willShowContent);
   // console.log('render: ', messages);
   // console.log(currentUser);
@@ -250,7 +258,7 @@ function Home() {
       <ServerStyles.ServerNav>
         <Link
           to="/discord-clone/server/@me"
-          aria-current={isNeutral && !isBrowser}
+          aria-current={isHome}
           key="@me"
         >
           <ServerIcon serverName="Home" src="gone" alt="@me" />
@@ -259,7 +267,7 @@ function Home() {
         <div className="line" />
         {servers.map((server) => (
           <Link
-            to={`/discord-clone/server/${server.serverKey}/${server.defaultChannel}`}
+            to={`/discord-clone/server/${server.serverKey}`}
             aria-current={server.serverKey === serverKey ? 'true' : 'false'}
             key={server.serverKey}
           >

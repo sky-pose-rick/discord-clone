@@ -60,7 +60,6 @@ function ServerBrowser(props) {
   const navigate = useNavigate();
   return (
     <div>
-      {userKey}
       <ServerList>
         {serverList.map((server) => (
           <ServerPanel
