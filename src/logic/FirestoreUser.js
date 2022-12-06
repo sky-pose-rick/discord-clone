@@ -582,6 +582,20 @@ async function getAllServers() {
   return serverList;
 }
 
+async function addUserToServer(serverKey, userKey) {
+  const userInServer = doc(db, 'servers', serverKey, 'users', userKey);
+  const serverInUser = doc(db, 'users', userKey, 'servers', serverKey);
+
+  // protect promoted users from being cleared if they click on a server they moderate
+  const userInServerDoc = await getDoc(serverInUser);
+  if (userInServerDoc.exists()) {
+    return;
+  }
+
+  await setDoc(userInServer, {});
+  await setDoc(serverInUser, {});
+}
+
 export default {
   sendMessage,
   deleteMessage,
@@ -606,4 +620,5 @@ export default {
   updateUser,
   createNewUser,
   getAllServers,
+  addUserToServer,
 };

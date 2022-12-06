@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import propTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 import FirestoreUser from '../logic/FirestoreUser';
 
 const ServerList = styled.ul`
@@ -29,6 +30,10 @@ const ServerPanel = styled.li`
     background-color: red;
     width: 50px;
     height: 50px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 `;
 
@@ -52,12 +57,20 @@ function useServers() {
 function ServerBrowser(props) {
   const { userKey } = props;
   const serverList = useServers();
+  const navigate = useNavigate();
   return (
     <div>
       {userKey}
       <ServerList>
         {serverList.map((server) => (
-          <ServerPanel key={server.serverKey}>
+          <ServerPanel
+            key={server.serverKey}
+            onClick={() => {
+              FirestoreUser.addUserToServer(server.serverKey, userKey).then(() => {
+                navigate(`/discord-clone/server/${server.serverKey}`);
+              });
+            }}
+          >
             <img src={server.iconURL} alt={server.altText} />
             <span>{server.serverName}</span>
           </ServerPanel>

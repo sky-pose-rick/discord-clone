@@ -28,6 +28,10 @@ const ImageWrapper = styled.div`{
     height: 50px;
     background-color: red;
     overflow: clip;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }`;
 
