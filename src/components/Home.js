@@ -12,18 +12,6 @@ import modals from '../logic/modals';
 
 import ServerStyles from '../component-styles/ServerStyles';
 
-const {
-  ServerFrame,
-  ServerNav,
-  HeaderBar,
-  ChannelNav,
-  Channel,
-  UserPanel,
-  MainContent,
-  InputBox,
-  UserList,
-} = ServerStyles;
-
 function useMessages(channelKey, mainRef, willShowContent) {
   const [messages, setMessages] = useState([]);
 
@@ -257,8 +245,8 @@ function Home() {
   // console.log(currentUser);
 
   return (
-    <ServerFrame>
-      <ServerNav>
+    <ServerStyles.ServerFrame>
+      <ServerStyles.ServerNav>
         <Link
           to="/discord-clone/server/@me"
           aria-current={isNeutral && !isBrowser}
@@ -304,8 +292,8 @@ function Home() {
         >
           <ServerIcon serverName="Find Server" src="gone" alt="Browse" />
         </Link>
-      </ServerNav>
-      <HeaderBar>
+      </ServerStyles.ServerNav>
+      <ServerStyles.HeaderBar>
         <div className="server-bar">{currentServer.serverName}</div>
         <div className="channel-bar">
           <span className="symbolled">{currentChannel.channelName}</span>
@@ -388,8 +376,8 @@ function Home() {
             Log Out
           </button>
         </div>
-      </HeaderBar>
-      <ChannelNav>
+      </ServerStyles.HeaderBar>
+      <ServerStyles.ChannelNav>
         {(currentServer.owner === currentUser.uid) && (
         <button
           className="create-channel"
@@ -409,13 +397,13 @@ function Home() {
             key={channel.channelKey}
             aria-current={channel.channelKey === channelKey ? 'true' : 'false'}
           >
-            <Channel>
+            <ServerStyles.Channel>
               <span className="symbolled">{channel.channelName}</span>
-            </Channel>
+            </ServerStyles.Channel>
           </Link>
         ))}
-      </ChannelNav>
-      <UserPanel onClick={() => {
+      </ServerStyles.ChannelNav>
+      <ServerStyles.UserPanel onClick={() => {
         modals.editUserModal(currentUser, (updatedUser) => {
           currentUser.setUser(updatedUser);
         });
@@ -423,9 +411,9 @@ function Home() {
       >
         <img src={currentUser.icon} alt="U" />
         <span>{currentUser.displayName}</span>
-      </UserPanel>
+      </ServerStyles.UserPanel>
       {willShowContent && (
-      <MainContent onWheelCapture={onContentScroll} ref={mainRef}>
+      <ServerStyles.MainContent onWheelCapture={onContentScroll} ref={mainRef}>
         {
           messages.map((message) => (
             <Message
@@ -442,17 +430,18 @@ function Home() {
             />
           ))
         }
-      </MainContent>
+      </ServerStyles.MainContent>
       )}
+      {!willShowContent && <ServerStyles.BlankMain>blank space to fill</ServerStyles.BlankMain>}
       {willShowContent && (
-      <InputBox>
+      <ServerStyles.InputBox>
         <textarea type="text" placeholder={`Message #${currentChannel.channelName}`} onKeyUp={textSubmit} />
-      </InputBox>
+      </ServerStyles.InputBox>
       )}
-      <UserList>
+      <ServerStyles.UserList>
         {willShowContent && <div>UserList</div>}
-      </UserList>
-    </ServerFrame>
+      </ServerStyles.UserList>
+    </ServerStyles.ServerFrame>
   );
 }
 

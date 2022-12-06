@@ -183,6 +183,10 @@ const UserList = styled.div`{
   grid-row: 2/5;
 }`;
 
+const BlankMain = styled(MainContent)`
+  grid-row: 2/5;
+`;
+
 export default {
   ServerFrame,
   ServerNav,
@@ -193,4 +197,5 @@ export default {
   MainContent,
   InputBox,
   UserList,
+  BlankMain,
 };

@@ -214,7 +214,7 @@ async function subscribeToMessages(
         const data = change.doc.data();
         const newMessage = {
           user: data.user,
-          timestamp: (data.timestamp) ? `${data.timestamp.toMillis()} ` : Date.now(),
+          timestamp: (data.timestamp) ? data.timestamp.toMillis() : Date.now(),
           content: data.content,
           deleted: !!data.deleted,
           messageKey: change.doc.id,
