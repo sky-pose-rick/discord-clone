@@ -9,6 +9,7 @@ import Message from './Message';
 import FirestoreUser from '../logic/FirestoreUser';
 import FirebaseAuthUser from '../logic/FirebaseAuthUser';
 import modals from '../logic/modals';
+import ServerBrowser from './ServerBrowser';
 
 import ServerStyles from '../component-styles/ServerStyles';
 
@@ -123,7 +124,7 @@ function useUser() {
   const [user, setUser] = useState({
     displayName: 'Loading',
     iconURL: 'missing',
-    uid: 0,
+    uid: 'missing',
   });
 
   useEffect(() => {
@@ -432,7 +433,11 @@ function Home() {
         }
       </ServerStyles.MainContent>
       )}
-      {!willShowContent && <ServerStyles.BlankMain>blank space to fill</ServerStyles.BlankMain>}
+      {!willShowContent && (
+      <ServerStyles.BlankMain>
+        {isBrowser && <ServerBrowser userKey={currentUser.uid} />}
+      </ServerStyles.BlankMain>
+      )}
       {willShowContent && (
       <ServerStyles.InputBox>
         <textarea type="text" placeholder={`Message #${currentChannel.channelName}`} onKeyUp={textSubmit} />

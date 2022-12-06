@@ -564,6 +564,24 @@ async function deleteServer(serverKey) {
   await deleteDoc(serverInUser);
 }
 
+async function getAllServers() {
+  const serverColl = await getDocs(collection(db, 'servers'));
+  const serverList = [];
+  serverColl.forEach((server) => {
+    const data = server.data();
+    const newServer = {
+      serverKey: server.id,
+      serverName: data.name,
+      iconURL: data.iconURL,
+      altText: data.name.slice(0, 3).toUpperCase(),
+      defaultChannel: data.defaultChannel,
+    };
+    serverList.push(newServer);
+  });
+
+  return serverList;
+}
+
 export default {
   sendMessage,
   deleteMessage,
@@ -587,4 +605,5 @@ export default {
   getSelf,
   updateUser,
   createNewUser,
+  getAllServers,
 };
