@@ -16,7 +16,6 @@ import ServerStyles from '../component-styles/ServerStyles';
 function useMessages(channelKey, mainRef, willShowContent) {
   const [messages, setMessages] = useState([]);
 
-  // useEffect needs to be called when state changes in order to update callback
   useEffect(() => {
     if (willShowContent) {
       const onNewMessage = (message, appendToStart) => {
@@ -207,7 +206,7 @@ function Home() {
   const messages = useMessages(channelKey, mainRef, !(isHome || isBrowser));
   const currentUser = useUser();
 
-  const willShowContent = !(isHome || isBrowser);
+  let willShowContent = !(isHome || isBrowser);
 
   const navigate = useNavigate();
 
@@ -226,8 +225,8 @@ function Home() {
     // detect invalid server key
     // fails if user has left all servers
 
-    // move to @me page
-    navigate('/discord-clone/server/@me');
+    // hide chat box
+    willShowContent = false;
   }
   let currentChannel = channels.find((channel) => channel.channelKey === channelKey) || {};
   if (isBrowser) {
@@ -245,8 +244,8 @@ function Home() {
   } else if (channels.length > 0 && !currentChannel.channelKey) {
     // detect invalid channel key
 
-    // move to first channel
-    navigate(`/discord-clone/server/${currentServer.serverKey}/${channels[0].channelKey}`);
+    // hide chat box
+    willShowContent = false;
   }
 
   const onContentScroll = useMouseWheel(mainRef, willShowContent);
