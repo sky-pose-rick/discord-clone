@@ -10,6 +10,7 @@ import FirestoreUser from '../logic/FirestoreUser';
 import FirebaseAuthUser from '../logic/FirebaseAuthUser';
 import modals from '../logic/modals';
 import ServerBrowser from './ServerBrowser';
+import UserList from './UserList';
 
 import ServerStyles from '../component-styles/ServerStyles';
 
@@ -244,8 +245,8 @@ function Home() {
   } else if (channels.length > 0 && !currentChannel.channelKey) {
     // detect invalid channel key
 
-    // hide chat box
-    willShowContent = false;
+    // not supposed to navigate mid-render
+    navigate(`/discord-clone/server/${currentServer.serverKey}/${channels[0].channelKey}`);
   }
 
   const onContentScroll = useMouseWheel(mainRef, willShowContent);
@@ -451,7 +452,12 @@ function Home() {
       </ServerStyles.InputBox>
       )}
       <ServerStyles.UserList>
-        {willShowContent && <div>UserList</div>}
+        {willShowContent && (
+        <UserList
+          serverKey={currentServer.serverKey}
+          selfKey={currentUser.uid}
+        />
+        )}
       </ServerStyles.UserList>
     </ServerStyles.ServerFrame>
   );

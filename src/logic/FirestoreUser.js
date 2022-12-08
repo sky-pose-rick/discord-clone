@@ -22,6 +22,7 @@ let channelSubscriber = null;
 let activeChannelKey = null;
 let activeServerKey = null;
 let messageCursor = null;
+let userListUnSub = null;
 let rootShown = false;
 const messagesToFetch = 12;
 
@@ -179,7 +180,7 @@ function unSubscribeToMessages() {
 
   activeChannelKey = null;
 
-  if (messageSubscriber.unsub) {
+  if (messageSubscriber && messageSubscriber.unsub) {
     messageSubscriber.unsub();
   }
 
@@ -194,6 +195,8 @@ async function subscribeToMessages(
   onDeleteMessage,
   onClearMessages,
 ) {
+  if (!channelKey) { return; }
+
   onClearMessages();
   activeChannelKey = channelKey;
   rootShown = false;
@@ -247,6 +250,62 @@ async function subscribeToMessages(
 
   channelSubscriber.unsub = unsub;
   // console.log('Got a subscription to messages');
+}
+
+async function subscribeToUserList(
+  serverKey,
+  onNewUser,
+  onChangeUser,
+  onDeleteUser,
+) {
+  if (!serverKey) { return; }
+
+  const serverDoc = await getDoc(doc(db, 'servers', serverKey));
+  const { owner } = serverDoc.data();
+
+  // should start listening to firestore snapshots here
+  const messageColl = collection(db, 'servers', serverKey, 'users');
+  const unsub = onSnapshot(query(messageColl), (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+      const data = change.doc.data();
+      const uid = change.doc.id;
+      if (change.type === 'added') {
+        // new user joins server or first load
+        const newUser = {
+          uid,
+          isOwner: owner === uid,
+          isAdmin: data.isModerator,
+          isModerator: data.isModerator,
+        };
+        onNewUser(newUser);
+      }
+      if (change.type === 'modified') {
+        // user promoted or demoted
+        const newUser = {
+          uid,
+          isOwner: owner === change.doc.id,
+          isAdmin: data.isModerator,
+          isModerator: data.isModerator,
+        };
+        onChangeUser(newUser);
+      }
+      if (change.type === 'removed') {
+        // leave server
+        onDeleteUser(uid);
+      }
+    });
+  });
+
+  userListUnSub = unsub;
+  // console.log('Got a subscription to messages');
+}
+
+function unSubscribeToUserList() {
+  if (userListUnSub) {
+    userListUnSub();
+  }
+
+  userListUnSub = null;
 }
 
 function subscribeToServers(onReplaceServerList) {
@@ -609,4 +668,6 @@ export default {
   createNewUser,
   getAllServers,
   addUserToServer,
+  subscribeToUserList,
+  unSubscribeToUserList,
 };

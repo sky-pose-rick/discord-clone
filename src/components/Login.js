@@ -24,7 +24,7 @@ function Login() {
     const password = form[1].value;
 
     FirebaseAuthUser.signInUser(email, password, () => {
-      navigate('/discord-clone/server/server1/channel1');
+      navigate('/discord-clone/server/@me');
     });
   };
 
