@@ -14,7 +14,7 @@ import fakeStorage from './fakeStorage';
 import FirebaseAuthUser from './FirebaseAuthUser';
 
 const db = getFirestore();
-const defaultUserIcon = 'blank.png';
+const defaultUserIcon = '/discord-clone/img/blank.png';
 
 let messageSubscriber = null;
 let serverSubscriber = null;

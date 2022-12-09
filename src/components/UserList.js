@@ -130,9 +130,10 @@ function useUserList(serverKey) {
     );
 
     return () => {
+      setUserList([]);
       FirestoreUser.unSubscribeToUserList();
     };
-  }, []);
+  }, [serverKey]);
 
   return userList;
 }
