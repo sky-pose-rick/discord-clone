@@ -275,6 +275,56 @@ function editUserModal(user, after) {
   });
 }
 
+function promoteUserModal(targetUser, serverKey, isOwner, after) {
+  const options = [
+    {
+      value: 'user',
+      string: 'None',
+    },
+    {
+      value: 'moderator',
+      string: 'Moderator',
+    },
+  ];
+
+  if (isOwner) {
+    options.push({
+      value: 'admin',
+      string: 'Administrator',
+    });
+  }
+
+  const selectPlaceholder = {
+    options,
+  };
+
+  if (targetUser.isAdmin) {
+    selectPlaceholder.default = 'admin';
+  } else if (targetUser.isModerator) {
+    selectPlaceholder.default = 'moderator';
+  } else {
+    selectPlaceholder.default = 'user';
+  }
+
+  createModal([
+    {
+      type: 'label',
+      label: `Change Role for ${targetUser.name}?`,
+      placeholder: 'none',
+    },
+    {
+      type: 'option',
+      label: 'Role: ',
+      placeholder: selectPlaceholder,
+    },
+  ], 'Save', async (inputValues) => {
+    await FirestoreUser.setUserRank(serverKey, targetUser.uid, inputValues[1]);
+    if (after) {
+      after();
+    }
+  });
+}
+
 export default {
   signOutModal,
   editServerModal,
@@ -286,4 +336,5 @@ export default {
   deleteMessageModal,
   leaveServerModal,
   editUserModal,
+  promoteUserModal,
 };

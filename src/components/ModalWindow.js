@@ -76,6 +76,27 @@ function makeInput(input, index, onInputChange, inputValues) {
           />
         </div>
       );
+    case 'option':
+      return (
+        <div key={index}>
+          <label htmlFor={id}>{label}</label>
+          <select
+            name="modal-select"
+            id={id}
+            onChange={onChange}
+            defaultValue={placeholder.default}
+          >
+            {placeholder.options.map((option) => (
+              <option
+                key={`modal-${option.value}`}
+                value={option.value}
+              >
+                {option.string}
+              </option>
+            ))}
+          </select>
+        </div>
+      );
     default:
       return (<div key={index}>{`${type}: ${label}: ${placeholder}`}</div>);
   }

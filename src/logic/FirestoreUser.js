@@ -70,7 +70,7 @@ async function getUserDetails(user, setUser) {
           const newUser = {
             uid: user,
             name: 'Missing',
-            icon: 'blank.png',
+            icon: defaultUserIcon,
           };
           setUser(newUser);
           resolve(newUser);
@@ -274,7 +274,7 @@ async function subscribeToUserList(
         const newUser = {
           uid,
           isOwner: owner === uid,
-          isAdmin: data.isModerator,
+          isAdmin: data.isAdmin,
           isModerator: data.isModerator,
         };
         onNewUser(newUser);
@@ -284,10 +284,10 @@ async function subscribeToUserList(
         const newUser = {
           uid,
           isOwner: owner === change.doc.id,
-          isAdmin: data.isModerator,
+          isAdmin: data.isAdmin,
           isModerator: data.isModerator,
         };
-        onChangeUser(newUser);
+        onChangeUser(uid, newUser);
       }
       if (change.type === 'removed') {
         // leave server
@@ -458,10 +458,8 @@ function pushFakeContent() {
     if (channelSubscriber) {
       channelSubscriber.onReplaceChannelList(fakeStorage.getChannels(activeServerKey));
     }
-    // console.log('valid server is active');
 
     if (messageSubscriber && activeChannelKey) {
-      // console.log('valid channel is active');
       const messages = fakeStorage.getMessages(
         activeServerKey,
         activeChannelKey,
@@ -643,6 +641,36 @@ async function addUserToServer(serverKey, userKey) {
   await setDoc(serverInUser, {});
 }
 
+async function setUserRank(serverKey, userKey, rank) {
+  let newDetails = {};
+
+  switch (rank) {
+    case 'admin': {
+      newDetails = {
+        isAdmin: true,
+        isModerator: false,
+      };
+      break;
+    }
+    case 'moderator': {
+      newDetails = {
+        isAdmin: false,
+        isModerator: true,
+      };
+      break;
+    }
+    default: {
+      newDetails = {
+        isAdmin: false,
+        isModerator: false,
+      };
+    }
+  }
+
+  const userInServer = doc(db, 'servers', serverKey, 'users', userKey);
+  await updateDoc(userInServer, newDetails);
+}
+
 export default {
   sendMessage,
   deleteMessage,
@@ -670,4 +698,5 @@ export default {
   addUserToServer,
   subscribeToUserList,
   unSubscribeToUserList,
+  setUserRank,
 };

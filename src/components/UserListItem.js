@@ -1,34 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 // import styled from 'styled-components';
 import propTypes from 'prop-types';
-import FirestoreUser from '../logic/FirestoreUser';
 
 function UserListItem(props) {
-  const { userKey } = props;
-  const [userDetails, setUserDetails] = useState({
-    uid: 0,
-    name: 'Loading',
-    icon: 'blank.png',
-  });
+  const { userDetails } = props;
 
-  useEffect(() => {
-    FirestoreUser.getUserDetails(userKey, setUserDetails);
-  }, [userKey]);
-
+  // TODO: apply styling for owner, admin, moderator
   return (
     <div>
-      <img src={userDetails.iconURL} alt="U" />
+      <img src={userDetails.icon} alt="U" />
       <span>{userDetails.name}</span>
     </div>
   );
 }
 
 UserListItem.propTypes = {
-  userKey: propTypes.string,
+  userDetails: propTypes.objectOf(),
 };
 
 UserListItem.defaultProps = {
-  userKey: null,
+  userDetails: {},
 };
 
 export default UserListItem;

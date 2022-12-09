@@ -22,7 +22,7 @@ const ImageWrapper = styled.div`{
   margin: 10px 20px auto;
   grid-row: 1/3;
 
-  &>img{
+  >img{
     border-radius: 50%;
     width: 50px;
     height: 50px;
