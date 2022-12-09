@@ -27,6 +27,11 @@ const ServerNav = styled.nav`{
     border-bottom: solid 1px gray;
     width: 50%;
   }
+
+  >a{
+    color: white;
+    text-decoration: none;
+  }
 }`;
 
 const HeaderBar = styled.div`{
@@ -152,6 +157,9 @@ const UserPanel = styled.div`{
     width: 50px;
     height: 50px;
     margin: 0px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }`;
 

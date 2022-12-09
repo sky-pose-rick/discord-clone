@@ -19,15 +19,15 @@ const ItemWrapper = styled.div`{
 
 const ActiveItemWrapper = styled(ItemWrapper)`{
   ${(props) => {
-    if (props.serverActive) {
-      return `
-          padding-left: 8px;
-          border-left: white 2px solid;
+    if (props.serveractive) {
+      return `&&{
+        padding-left: 8px;
+        border-left: white 2px solid;
 
-          div{
-            border-radius: 15px;
-          }
-        `;
+        div{
+          border-radius: 15px;
+        }
+      }`;
     }
     return '';
   }}
@@ -50,6 +50,18 @@ const IconWrapper = styled.div`{
 }`;
 
 const ServerIconImage = styled.img`{
+
+  ${(props) => {
+    if (props.isDefault) {
+      return `{
+        &&{background-color: #687759}
+      }`;
+    }
+    return `{
+      &&{background-color: blue}
+    }`;
+  }}
+
   width: 50px;
   height: 50px;
   background-color: blue;
@@ -57,17 +69,19 @@ const ServerIconImage = styled.img`{
   display: flex;
   align-items: center;
   justify-content: center;
+
+  color: white;
 }`;
 
 function ServerIcon(props) {
   const {
-    src, alt, serverActive, serverName,
+    src, alt, serverActive, serverName, isDefault,
   } = props;
 
   return (
-    <ActiveItemWrapper serverActive={serverActive}>
+    <ActiveItemWrapper serveractive={serverActive}>
       <IconWrapper serverName={serverName}>
-        <ServerIconImage src={src} alt={alt} />
+        <ServerIconImage src={src} alt={alt} isDefault={isDefault} />
       </IconWrapper>
     </ActiveItemWrapper>
   );
@@ -78,6 +92,7 @@ ServerIcon.propTypes = {
   alt: propTypes.string,
   serverName: propTypes.string,
   serverActive: propTypes.bool,
+  isDefault: propTypes.bool,
 };
 
 ServerIcon.defaultProps = {
@@ -85,6 +100,7 @@ ServerIcon.defaultProps = {
   alt: 'ERR',
   serverName: '',
   serverActive: false,
+  isDefault: false,
 };
 
 export default ServerIcon;

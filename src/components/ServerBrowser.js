@@ -27,7 +27,7 @@ const ServerPanel = styled.li`
   &>img{
     border-radius: 50%;
     overflow: clip;
-    background-color: red;
+    background-color: blue;
     width: 50px;
     height: 50px;
 

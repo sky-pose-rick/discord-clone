@@ -261,20 +261,21 @@ function Home() {
           aria-current={isHome}
           key="@me"
         >
-          <ServerIcon serverName="Home" src="gone" alt="@me" />
+          <ServerIcon serverName="Home" src="gone" alt="@me" serverActive={isHome} isDefault />
         </Link>
 
         <div className="line" />
         {servers.map((server) => (
           <Link
             to={`/discord-clone/server/${server.serverKey}`}
-            aria-current={server.serverKey === serverKey ? 'true' : 'false'}
+            aria-current={server.serverKey === serverKey}
             key={server.serverKey}
           >
             <ServerIcon
               serverName={server.serverName}
               src={server.iconURL}
               alt={server.altText}
+              serverActive={server.serverKey === serverKey}
             />
           </Link>
         ))}
@@ -291,7 +292,8 @@ function Home() {
           <ServerIcon
             serverName="New Server"
             src="gone"
-            alt="create"
+            alt="Create"
+            isDefault
           />
         </div>
         <Link
@@ -299,7 +301,13 @@ function Home() {
           aria-current={isBrowser}
           key="@browse"
         >
-          <ServerIcon serverName="Find Server" src="gone" alt="Browse" />
+          <ServerIcon
+            serverName="Find Server"
+            src="gone"
+            alt="Browse"
+            serverActive={isBrowser}
+            isDefault
+          />
         </Link>
       </ServerStyles.ServerNav>
       <ServerStyles.HeaderBar>
