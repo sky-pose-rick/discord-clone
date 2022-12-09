@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import propTypes from 'prop-types';
 import FirestoreUser from '../logic/FirestoreUser';
 import modals from '../logic/modals';
@@ -22,6 +22,18 @@ const UserRow = styled.li`{
   list-style:none;
   background-color: #3a3b40;
 
+  ${(props) => {
+    if (props.isOwner) {
+      return css`&&{color:red}`;
+    } if (props.isAdmin) {
+      return css`&&{color:orange}`;
+    } if (props.isModerator) {
+      return css`&&{color:yellow}`;
+    }
+    return css`&&{}`;
+  }
+}
+
   :hover{
     background-color: #3f4145;
   }
@@ -31,6 +43,7 @@ const UserRow = styled.li`{
     width: 30px;
     height: 30px;
     background-color: red;
+    color: white;
     overflow: clip;
 
     display: flex;
@@ -146,6 +159,9 @@ function UserList(props) {
           // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events
           <UserRow
             key={`ul-${user.uid}`}
+            isOwner={user.isOwner}
+            isAdmin={user.isAdmin}
+            isModerator={user.isModerator}
             onClick={() => {
               if (selfKey === user.uid || user.isOwner) { return; }
               if (selfIsOwner) {
