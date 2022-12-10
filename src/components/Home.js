@@ -120,24 +120,68 @@ function useChannels(serverKey, willShowContent) {
   return channels;
 }
 
-function useUser() {
-  const [user, setUser] = useState({
-    displayName: 'Loading',
-    iconURL: 'missing',
-    uid: 'missing',
-  });
+function useUser(currentServer, willShowContent) {
+  const serverKey = (currentServer) ? currentServer.serverKey : 'dummy-server';
+
+  // uid from firestore auth
+  const [userKey, setUserKey] = useState('0');
 
   useEffect(() => {
     const userPromise = FirestoreUser.getSelf();
 
     userPromise.then((data) => {
-      setUser(data);
+      setUserKey(data.uid);
     });
   }, []);
 
+  // userDetails from user collection
+  const [userDetails, setUserDetails] = useState({
+    uid: userKey,
+    name: 'missing',
+    icon: 'blank.png',
+  });
+
+  useEffect(() => {
+    const unsub = FirestoreUser.subscribeToUserSelf(userKey, (details) => {
+      setUserDetails(details);
+    });
+
+    return unsub;
+  }, [userKey]);
+
+  // userDetails from server collection
+  const [userInServer, setUserInServer] = useState({
+    isOwner: false,
+    isModerator: false,
+    isAdmin: false,
+  });
+
+  useEffect(() => {
+    if (!willShowContent) {
+      setUserInServer({
+        isOwner: false,
+        isModerator: false,
+        isAdmin: false,
+      });
+      return () => {};
+    }
+    const unsub = FirestoreUser.subscribeToSelfInServer(
+      userKey,
+      serverKey,
+      (details) => {
+        setUserInServer({
+          ...details,
+          isOwner: userKey === currentServer.owner,
+        });
+      },
+    );
+
+    return unsub;
+  }, [userKey, serverKey]);
+
   return {
-    ...user,
-    setUser,
+    ...userDetails,
+    ...userInServer,
   };
 }
 
@@ -205,13 +249,19 @@ function Home() {
   const channels = useChannels(serverKey, !(isHome || isBrowser));
 
   const messages = useMessages(channelKey, mainRef, !(isHome || isBrowser));
-  const currentUser = useUser();
 
   let willShowContent = !(isHome || isBrowser);
 
   const navigate = useNavigate();
 
-  let currentServer = servers.find((server) => server.serverKey === serverKey) || {};
+  let currentServer = servers.find((server) => server.serverKey === serverKey) || {
+    serverKey: serverKey || 'bad-key',
+    serverName: 'Loading',
+    iconURL: 'Missing',
+    altText: 'LDG',
+    owner: 'X',
+
+  };
   if (isBrowser) {
     currentServer = {
       serverKey: 'dummy-server',
@@ -229,6 +279,9 @@ function Home() {
     // hide chat box
     willShowContent = false;
   }
+
+  const currentUser = useUser(currentServer, willShowContent);
+
   let currentChannel = channels.find((channel) => channel.channelKey === channelKey) || {};
   if (isBrowser) {
     currentChannel = {
@@ -316,7 +369,7 @@ function Home() {
           <span className="symbolled">{currentChannel.channelName}</span>
           <div className="line" />
           <span className="channel-desc">{currentChannel.channelDesc}</span>
-          {willShowContent && (currentServer.owner === currentUser.uid) && (
+          {willShowContent && (currentUser.isOwner || currentUser.isAdmin) && (
           <button
             className="edit-server"
             type="button"
@@ -327,7 +380,7 @@ function Home() {
             Edit Server
           </button>
           )}
-          {willShowContent && (currentServer.owner === currentUser.uid) && (
+          {willShowContent && (currentUser.isOwner) && (
           <button
             className="delete-server"
             type="button"
@@ -340,7 +393,7 @@ function Home() {
             Delete Server
           </button>
           ) }
-          {willShowContent && (currentServer.owner !== currentUser.uid) && (
+          {willShowContent && (!currentUser.isOwner) && (
           <button
             className="leave-server"
             type="button"
@@ -353,7 +406,7 @@ function Home() {
             Leave Server
           </button>
           ) }
-          {willShowContent && (currentServer.owner === currentUser.uid) && (
+          {willShowContent && (currentUser.isOwner || currentUser.isAdmin) && (
           <button
             className="edit-channel"
             type="button"
@@ -364,7 +417,7 @@ function Home() {
             Edit Channel
           </button>
           )}
-          {willShowContent && (currentServer.owner === currentUser.uid) && (
+          {willShowContent && (currentUser.isOwner || currentUser.isAdmin) && (
           <button
             className="delete-channel"
             type="button"
@@ -395,7 +448,7 @@ function Home() {
         </div>
       </ServerStyles.HeaderBar>
       <ServerStyles.ChannelNav>
-        {(currentServer.owner === currentUser.uid) && (
+        {(currentUser.isOwner || currentUser.isAdmin) && (
         <button
           className="create-channel"
           type="button"
@@ -421,13 +474,11 @@ function Home() {
         ))}
       </ServerStyles.ChannelNav>
       <ServerStyles.UserPanel onClick={() => {
-        modals.editUserModal(currentUser, (updatedUser) => {
-          currentUser.setUser(updatedUser);
-        });
+        modals.editUserModal(currentUser);
       }}
       >
         <img src={currentUser.icon} alt="U" />
-        <span>{currentUser.displayName}</span>
+        <span>{currentUser.name}</span>
       </ServerStyles.UserPanel>
       {willShowContent && (
       <ServerStyles.MainContent onWheelCapture={onContentScroll} ref={mainRef}>
@@ -440,7 +491,7 @@ function Home() {
               deleted={message.deleted}
               key={message.messageKey}
               isRoot={message.isRoot}
-              isModerator
+              isModerator={currentUser.isOwner || currentUser.isAdmin || currentUser.isModerator}
               deleteFunc={() => {
                 modals.deleteMessageModal(currentChannel, message);
               }}

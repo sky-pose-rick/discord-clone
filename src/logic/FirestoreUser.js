@@ -671,6 +671,42 @@ async function setUserRank(serverKey, userKey, rank) {
   await updateDoc(userInServer, newDetails);
 }
 
+function subscribeToUserSelf(uid, onUserChange) {
+  const userRef = doc(db, 'users', uid);
+  const unsub = onSnapshot(userRef, (userDoc) => {
+    const data = userDoc.data();
+    if (data) {
+      onUserChange({
+        uid,
+        name: data.displayName,
+        icon: data.iconURL || defaultUserIcon,
+      });
+    }
+  });
+
+  return unsub;
+}
+
+function subscribeToSelfInServer(uid, serverKey, onUserChange) {
+  const userRef = doc(db, 'servers', serverKey, 'users', uid);
+  const unsub = onSnapshot(userRef, (userDoc) => {
+    const data = userDoc.data();
+    if (data) {
+      onUserChange({
+        isAdmin: data.isAdmin,
+        isModerator: data.isModerator,
+      });
+    } else {
+      onUserChange({
+        isAdmin: false,
+        isModerator: false,
+      });
+    }
+  });
+
+  return unsub;
+}
+
 export default {
   sendMessage,
   deleteMessage,
@@ -699,4 +735,6 @@ export default {
   subscribeToUserList,
   unSubscribeToUserList,
   setUserRank,
+  subscribeToUserSelf,
+  subscribeToSelfInServer,
 };
