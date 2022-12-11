@@ -33,3 +33,4 @@ firebase.json
 
 # firebase emulator logs
 *-debug.log
+src/logic/firestoretests.txt
