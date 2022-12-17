@@ -72,7 +72,7 @@ function Register() {
         <button type="submit">Continue</button>
       </form>
       <div>
-        <a href="/discord-clone/server/login">Already have an account?</a>
+        <a href="/discord-clone/login">Already have an account?</a>
       </div>
       <div className="policy">
         By registering, you agree to not make a mess of this project.

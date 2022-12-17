@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  BrowserRouter,
+  HashRouter,
   Route, Routes,
 } from 'react-router-dom';
 import Fallback from './components/Fallback';
@@ -12,7 +12,7 @@ function App() {
   const modalWindow = modalService.getModalWindow();
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       {modalWindow}
       <Routes>
         {/* <Route path="/discord-clone" element={<Home />} /> */}
@@ -26,7 +26,7 @@ function App() {
         <Route path="/discord-clone/discovery" element={<VerifyLogin />} />
         <Route path="*" element={<Fallback />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

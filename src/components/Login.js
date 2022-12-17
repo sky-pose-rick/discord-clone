@@ -52,7 +52,7 @@ function Login() {
       </form>
       <div>
         Need an account?
-        <a href="/discord-clone/server/register">Register</a>
+        <a href="/discord-clone/register">Register</a>
       </div>
     </FormBox>
   );
