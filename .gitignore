@@ -30,7 +30,7 @@ src/reference
 public/test-img
 firebase.json
 .firebaserc
+src/logic/firestoretests.txt
 
 # firebase emulator logs
 *-debug.log
-src/logic/firestoretests.txt

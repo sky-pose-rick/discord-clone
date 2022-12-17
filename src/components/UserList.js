@@ -68,39 +68,6 @@ function useUserList(serverKey) {
   const [userList, setUserList] = useState([]);
 
   useEffect(() => {
-    const onNewUser = async (user) => {
-      const userDetails = { ...user };
-
-      await FirestoreUser.getUserDetails(userDetails.uid, (details) => {
-        userDetails.name = details.name;
-        userDetails.icon = details.icon;
-      });
-
-      setUserList((prev) => {
-        // check for duplicate listing
-        const index = prev.findIndex((oldUser) => user.uid === oldUser.uid);
-        if (index > -1) {
-          return prev;
-        }
-
-        // spread to flag a re-render
-        const newArray = [...prev];
-        newArray.push(userDetails);
-        return newArray;
-      });
-    };
-
-    const onDeleteUser = (key) => {
-      setUserList((prev) => {
-        const index = prev.findIndex((user) => key === user.uid);
-        if (index > -1) {
-          const newArray = prev.slice(0, index).concat(prev.slice(index));
-          return newArray;
-        }
-        // if message is not found, make no changes
-        return prev;
-      });
-    };
     const onChangeUser = async (key, updatedUser) => {
       const userDetails = { ...updatedUser };
 
@@ -115,6 +82,57 @@ function useUserList(serverKey) {
           // spread to flag a re-render
           const newArray = [...prev];
           newArray[index] = userDetails;
+          return newArray;
+        }
+        // if message is not found, make no changes
+        return prev;
+      });
+    };
+
+    const onNewUser = async (user) => {
+      const userDetails = { ...user };
+
+      // set details now with placeholders
+      userDetails.name = user.uid;
+      userDetails.icon = 'blank';
+
+      setUserList((prev) => {
+        // check for duplicate listing
+        const index = prev.findIndex((oldUser) => user.uid === oldUser.uid);
+        if (index > -1) {
+          return prev;
+        }
+
+        // spread to flag a re-render
+        const newArray = [...prev];
+        newArray.push(userDetails);
+        return newArray;
+      });
+
+      FirestoreUser.getUserDetails(userDetails.uid, (details) => {
+        // set correct details
+        userDetails.name = details.name;
+        userDetails.icon = details.icon;
+
+        setUserList((prev) => {
+          const index = prev.findIndex((item) => userDetails.uid === item.uid);
+          if (index > -1) {
+            // spread to flag a re-render
+            const newArray = [...prev];
+            newArray[index] = userDetails;
+            return newArray;
+          }
+          // if message is not found, make no changes
+          return prev;
+        });
+      });
+    };
+
+    const onDeleteUser = (key) => {
+      setUserList((prev) => {
+        const index = prev.findIndex((user) => key === user.uid);
+        if (index > -1) {
+          const newArray = prev.slice(0, index).concat(prev.slice(index));
           return newArray;
         }
         // if message is not found, make no changes
