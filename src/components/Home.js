@@ -272,11 +272,9 @@ function Home() {
       serverKey: 'dummy-server',
       serverName: 'Home',
     };
-  } else if (servers.length > 0 && !currentServer.serverKey) {
+  } else if (!currentServer.serverKey) {
     // detect invalid server key
-    // fails if user has left all servers
-
-    // hide chat box
+    // hide content
     willShowContent = false;
   }
 
@@ -295,11 +293,10 @@ function Home() {
       channelName: 'Home',
       channelDesc: 'Your home page',
     };
-  } else if (channels.length > 0 && !currentChannel.channelKey) {
+  } else if (!currentChannel.channelKey) {
     // detect invalid channel key
-
-    // not supposed to navigate mid-render
-    navigate(`/discord-clone/server/${currentServer.serverKey}/${channels[0].channelKey}`);
+    // do not render
+    willShowContent = false;
   }
 
   const onContentScroll = useMouseWheel(mainRef, willShowContent);
