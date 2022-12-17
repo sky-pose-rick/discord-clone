@@ -7,9 +7,12 @@ function VerifyLogin() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!FirebaseAuthUser.isSignedIn()) {
-      navigate('/discord-clone/login');
-    }
+    FirebaseAuthUser.isSignedIn().then((user) => {
+      // console.log('verify login', user);
+      if (!user) {
+        navigate('/discord-clone/login');
+      }
+    });
   }, []);
 
   return (

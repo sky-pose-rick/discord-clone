@@ -27,6 +27,11 @@ const ServerNav = styled.nav`{
     border-bottom: solid 1px gray;
     width: 50%;
   }
+
+  >a{
+    color: white;
+    text-decoration: none;
+  }
 }`;
 
 const HeaderBar = styled.div`{
@@ -76,6 +81,11 @@ const HeaderBar = styled.div`{
     border-left: solid 1px gray;
     height: 50%;
   }
+
+  .signout{
+    margin-left: auto;
+    margin-right: 1em;
+  }
 }`;
 
 const ChannelNav = styled.nav`{
@@ -94,6 +104,10 @@ const ChannelNav = styled.nav`{
   row-gap: 5px;
   overflow: hidden scroll;
   scrollbar-width: none;
+
+  >a{
+    text-decoration: none;
+  }
 }`;
 
 const Channel = styled.div`{
@@ -105,11 +119,6 @@ const Channel = styled.div`{
 
     .symbolled{
       color: #dee1d8;
-    }
-
-    .symbolled::after{
-      content: "G";
-      margin-left: auto;
     }
   }
 
@@ -130,10 +139,27 @@ const Channel = styled.div`{
 
 const UserPanel = styled.div`{
   background-color: #2a2b2f;
-  color: white;
   grid-row: 4 / 5;
   grid-column: 2 / 3;
-  height: 40px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+
+  color: white;
+  font-size: 1em;
+  font-weight: bold;
+
+  img{
+    border-radius: 50%;
+    overflow: clip;
+    background-color: red;
+    width: 50px;
+    height: 50px;
+    margin: 0px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }`;
 
 const MainContent = styled.main`{
@@ -178,6 +204,32 @@ const UserList = styled.div`{
   grid-row: 2/5;
 }`;
 
+const BlankMain = styled(MainContent)`
+  grid-row: 2/5;
+`;
+
+const TopNavButton = styled.button`
+  background-color: #71737a;
+  color: white;
+  border: none;
+  padding: 6px;
+
+  :active{
+    background-color: #4f4f4f;
+  }
+`;
+
+const LogOutButton = styled(TopNavButton)`
+  color: #f77;
+  font-size: 1.1em;
+  padding: 6px 20px;
+  text-shadow: #111 2px 1px 2px;
+`;
+
+const NewChannelButton = styled(TopNavButton)`
+  margin: 10px 20px;
+`;
+
 export default {
   ServerFrame,
   ServerNav,
@@ -188,4 +240,8 @@ export default {
   MainContent,
   InputBox,
   UserList,
+  BlankMain,
+  TopNavButton,
+  LogOutButton,
+  NewChannelButton,
 };

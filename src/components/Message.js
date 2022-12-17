@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import propTypes from 'prop-types';
 import styled from 'styled-components';
+import FirestoreUser from '../logic/FirestoreUser';
 
 const MessageBox = styled.div`{
   display: grid;
@@ -18,17 +19,26 @@ const MessageBox = styled.div`{
 }`;
 
 const ImageWrapper = styled.div`{
-  border-radius: 50%;
-  overflow: clip;
-  background-color: red;
-  width: 50px;
-  height: 50px;
+  margin: 10px 20px auto;
   grid-row: 1/3;
-  margin: 0px 20px;
+
+  >img{
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    background-color: red;
+    overflow: clip;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }`;
 
 const MessageHeader = styled.div`{
   margin-top: 5px;
+  display: flex;
+  align-items: center;
 
   >span{
     color: #5a5d63;
@@ -43,12 +53,37 @@ const MessageHeader = styled.div`{
   }
 }`;
 
+const DeleteButton = styled.button`{
+  margin-left: auto;
+  margin-right: 10px;
+  visibility: hidden;
+
+  ${MessageBox}: hover & {
+    visibility: inherit;
+  }
+}`;
+
 function Message(props) {
   const {
-    user, timestamp, content, deleted, isRoot,
+    user, timestamp, content, deleted, isRoot, isModerator, deleteFunc,
   } = props;
 
+  const [userDetails, setUserDetails] = useState({
+    uid: 0,
+    name: 'Loading',
+    icon: 'blank.png',
+  });
+
+  if (!isRoot) {
+    // useEffect stops re-renders
+    useEffect(() => {
+      FirestoreUser.getUserDetails(user, setUserDetails);
+    }, []);
+  }
+
   const linedContent = content.split('\n');
+  const displayDate = new Date();
+  displayDate.setTime(timestamp);
 
   // TODO: remove username and image for consecutive messages
   return (
@@ -59,11 +94,16 @@ function Message(props) {
         && (
         <MessageBox>
           <ImageWrapper>
-            <div />
+            <img src={userDetails.icon} alt="U" />
           </ImageWrapper>
           <MessageHeader>
-            <span>{user}</span>
-            <span>{timestamp}</span>
+            <span>{userDetails.name}</span>
+            <span>{displayDate.toString()}</span>
+            {isModerator && !deleted && (
+            <DeleteButton type="button" onClick={deleteFunc}>
+              X
+            </DeleteButton>
+            )}
           </MessageHeader>
           <div>
             {deleted && <p>{'<deleted>'}</p>}
@@ -79,18 +119,22 @@ function Message(props) {
 
 Message.propTypes = {
   user: propTypes.string,
-  timestamp: propTypes.string,
+  timestamp: propTypes.number,
   content: propTypes.string,
   deleted: propTypes.bool,
   isRoot: propTypes.bool,
+  isModerator: propTypes.bool,
+  deleteFunc: propTypes.func,
 };
 
 Message.defaultProps = {
   user: 'missing',
-  timestamp: 'missing',
+  timestamp: 0,
   content: 'missing',
   deleted: false,
   isRoot: false,
+  isModerator: false,
+  deleteFunc: () => {},
 };
 
 export default Message;

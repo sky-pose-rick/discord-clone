@@ -23,13 +23,14 @@ yarn-debug.log*
 yarn-error.log*
 
 # api keys
-src/firebaseConfig.js
+src/logic/firebaseConfig.js
 
 # local testing files
 src/reference
 public/test-img
 firebase.json
 .firebaserc
+src/logic/firestoretests.txt
 
 # firebase emulator logs
 *-debug.log

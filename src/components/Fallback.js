@@ -5,13 +5,10 @@ function Fallback() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // TODO: check for login status
-  // logged in: redirect to @me
-  // logged out: redirect to login
   useEffect(() => {
     console.log('Invalid location', location);
     console.log('Forced re-direct');
-    navigate('/discord-clone/server/server1/channel1');
+    navigate('/discord-clone/server/@me');
   }, []);
 
   return (

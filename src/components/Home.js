@@ -1,83 +1,79 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, {
+  useState, useEffect, useRef,
+} from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 // import styled from 'styled-components';
 import uniqid from 'uniqid';
 import ServerIcon from './ServerIcon';
 import Message from './Message';
 import FirestoreUser from '../logic/FirestoreUser';
 import FirebaseAuthUser from '../logic/FirebaseAuthUser';
+import modals from '../logic/modals';
+import ServerBrowser from './ServerBrowser';
+import UserList from './UserList';
 
 import ServerStyles from '../component-styles/ServerStyles';
 
-const {
-  ServerFrame,
-  ServerNav,
-  HeaderBar,
-  ChannelNav,
-  Channel,
-  UserPanel,
-  MainContent,
-  InputBox,
-  UserList,
-} = ServerStyles;
-
-function useMessages(channelKey, mainRef) {
+function useMessages(channelKey, mainRef, willShowContent) {
   const [messages, setMessages] = useState([]);
 
-  // useEffect needs to be called when state changes in order to update callback
   useEffect(() => {
-    const onNewMessage = (message, appendToStart) => {
-      const main = mainRef.current;
-      const willScroll = main.scrollHeight - main.scrollTop - main.clientHeight < 60;
+    if (willShowContent) {
+      const onNewMessage = (message, appendToStart) => {
+        const main = mainRef.current;
+        const willScroll = main.scrollHeight - main.scrollTop - main.clientHeight < 60;
 
-      setMessages((prev) => {
+        setMessages((prev) => {
         // spread to flag a re-render
-        const newArray = [...prev];
-        if (appendToStart) {
-          newArray.unshift(message);
-        } else {
-          newArray.push(message);
-        }
-        return newArray;
-      });
-
-      // scroll to bottom
-      if (willScroll && !appendToStart) {
-        main.scroll({ top: main.scrollHeight, behavior: 'instant' });
-      }
-    };
-
-    const onDeleteMessage = (key) => {
-      // don't need to update message content
-      setMessages((prev) => {
-        const index = prev.findIndex((message) => key === message.messageKey);
-        if (index > -1) {
-          // spread to flag a re-render
           const newArray = [...prev];
-          const newMessage = { ...prev[index] };
-          newMessage.deleted = true;
-          newArray[index] = newMessage;
+          if (appendToStart) {
+            newArray.unshift(message);
+          } else {
+            newArray.push(message);
+          }
           return newArray;
+        });
+
+        // scroll to bottom
+        if (willScroll && !appendToStart) {
+          main.scroll({ top: main.scrollHeight, behavior: 'instant' });
         }
-        // if message is not found, make no changes
-        return prev;
-      });
-    };
-    const onChangeMessage = () => {};
-    const onClearMessages = () => { setMessages([]); };
+      };
 
-    FirestoreUser.subscribeToMessages(
-      channelKey,
-      onNewMessage,
-      onChangeMessage,
-      onDeleteMessage,
-      onClearMessages,
-    );
+      const onDeleteMessage = (key) => {
+      // don't need to update message content
+        setMessages((prev) => {
+          const index = prev.findIndex((message) => key === message.messageKey);
+          if (index > -1) {
+          // spread to flag a re-render
+            const newArray = [...prev];
+            const newMessage = { ...prev[index] };
+            newMessage.deleted = true;
+            newArray[index] = newMessage;
+            return newArray;
+          }
+          // if message is not found, make no changes
+          return prev;
+        });
+      };
+      const onChangeMessage = () => {};
+      const onClearMessages = () => { setMessages([]); };
 
-    return () => {
-      FirestoreUser.unSubscribeToMessages();
-    };
-  }, [channelKey]);
+      FirestoreUser.subscribeToMessages(
+        channelKey,
+        onNewMessage,
+        onChangeMessage,
+        onDeleteMessage,
+        onClearMessages,
+      );
+
+      return () => {
+        FirestoreUser.unSubscribeToMessages();
+      };
+    }
+    setMessages([]);
+    return () => {};
+  }, [channelKey, willShowContent]);
 
   return messages;
 }
@@ -96,12 +92,12 @@ function useServers() {
     return () => {
       FirestoreUser.unSubscribeToServers();
     };
-  }, [servers]);
+  }, []);
 
   return servers;
 }
 
-function useChannels(serverKey) {
+function useChannels(serverKey, willShowContent) {
   const [channels, setChannels] = useState([]);
 
   const onReplaceChannelList = (list) => {
@@ -110,27 +106,90 @@ function useChannels(serverKey) {
   };
 
   useEffect(() => {
-    FirestoreUser.subscribeToChannels(serverKey, onReplaceChannelList);
+    if (willShowContent) {
+      FirestoreUser.subscribeToChannels(serverKey, onReplaceChannelList);
 
-    return () => {
-      FirestoreUser.unSubscribeToChannels();
-    };
-  }, [serverKey]);
+      return () => {
+        FirestoreUser.unSubscribeToChannels();
+      };
+    }
+    setChannels([]);
+    return () => {};
+  }, [serverKey, willShowContent]);
 
   return channels;
+}
+
+function useUser(currentServer) {
+  const serverKey = (currentServer) ? currentServer.serverKey : 'dummy-server';
+
+  // uid from firestore auth
+  const [userKey, setUserKey] = useState('0');
+
+  useEffect(() => {
+    const userPromise = FirestoreUser.getSelf();
+
+    userPromise.then((data) => {
+      setUserKey(data.uid);
+    });
+  }, []);
+
+  // userDetails from user collection
+  const [userDetails, setUserDetails] = useState({
+    uid: userKey,
+    name: 'missing',
+    icon: 'blank.png',
+  });
+
+  useEffect(() => {
+    const unsub = FirestoreUser.subscribeToUserSelf(userKey, (details) => {
+      setUserDetails(details);
+    });
+
+    return unsub;
+  }, [userKey]);
+
+  // userDetails from server collection
+  const [userInServer, setUserInServer] = useState({
+    isOwner: false,
+    isModerator: false,
+    isAdmin: false,
+  });
+
+  useEffect(() => {
+    const unsub = FirestoreUser.subscribeToSelfInServer(
+      userKey,
+      serverKey,
+      (details) => {
+        setUserInServer({
+          ...details,
+          isOwner: userKey === currentServer.owner,
+        });
+      },
+    );
+
+    return unsub;
+  }, [userKey, serverKey]);
+
+  return {
+    ...userDetails,
+    ...userInServer,
+  };
 }
 
 function textSubmit(e) {
   // console.log(e);
   const textContent = e.target.value.trim();
   if (e.code === 'Enter' && textContent) {
-    const user = FirebaseAuthUser.getUser();
-    // console.log(textContent);
-    FirestoreUser.sendMessage({
-      content: textContent,
-      timestamp: 'Now',
-      user: user.username,
-      messageKey: uniqid(),
+    const userPromise = FirebaseAuthUser.getUserAuth();
+    userPromise.then((data) => {
+      // console.log(textContent);
+      FirestoreUser.sendMessage({
+        content: textContent,
+        timestamp: 'Now',
+        user: data.uid,
+        messageKey: uniqid(),
+      });
     });
     e.target.value = '';
     e.stopPropagation();
@@ -140,8 +199,12 @@ function textSubmit(e) {
   }
 }
 
-function useMouseWheel(mainRef) {
+function useMouseWheel(mainRef, willShowContent) {
   const [ticking, setTicking] = useState(false);
+
+  if (!willShowContent) {
+    return () => {};
+  }
 
   const onWheel = () => {
     if (!ticking) {
@@ -159,7 +222,7 @@ function useMouseWheel(mainRef) {
       setTicking(true);
       setTimeout(() => {
         setTicking(false);
-      }, 250);
+      }, 1250);
     }
   };
 
@@ -169,62 +232,245 @@ function useMouseWheel(mainRef) {
 function Home() {
   const params = useParams();
   const { serverKey, channelKey } = params;
+
+  const isHome = serverKey === '@me';
+  const isBrowser = serverKey === '@browse';
   const mainRef = useRef();
 
   const servers = useServers();
-  const channels = useChannels(serverKey);
-  const messages = useMessages(channelKey, mainRef);
+  const channels = useChannels(serverKey, !(isHome || isBrowser));
 
-  // const navigate = useNavigate();
-  const onContentScroll = useMouseWheel(mainRef);
+  const messages = useMessages(channelKey, mainRef, !(isHome || isBrowser));
+
+  let willShowContent = !(isHome || isBrowser);
+
+  const navigate = useNavigate();
+
+  let currentServer = servers.find((server) => server.serverKey === serverKey) || {
+    serverKey: serverKey || 'bad-key',
+    serverName: 'Loading',
+    iconURL: 'Missing',
+    altText: 'LDG',
+    owner: 'X',
+
+  };
+  if (isBrowser) {
+    currentServer = {
+      serverKey: 'dummy-server',
+      serverName: 'Browse',
+    };
+  } else if (isHome) {
+    currentServer = {
+      serverKey: 'dummy-server',
+      serverName: 'Home',
+    };
+  } else if (!currentServer.serverKey) {
+    // detect invalid server key
+    // hide content
+    willShowContent = false;
+  }
+
+  const currentUser = useUser(currentServer, willShowContent);
+
+  let currentChannel = channels.find((channel) => channel.channelKey === channelKey) || {};
+  if (isBrowser) {
+    currentChannel = {
+      channelKey: 'dummy-server',
+      channelName: 'Browse',
+      channelDesc: 'Join an existing server',
+    };
+  } else if (isHome) {
+    currentChannel = {
+      channelKey: 'dummy-server',
+      channelName: 'Home',
+      channelDesc: 'Your home page',
+    };
+  } else if (!currentChannel.channelKey) {
+    // detect invalid channel key
+    // do not render
+    willShowContent = false;
+  }
+
+  const onContentScroll = useMouseWheel(mainRef, willShowContent);
   // console.log('render: ', messages);
+  // console.log(currentUser);
 
   return (
-    <ServerFrame>
-      <ServerNav>
-        <ServerIcon serverName="Home" src="gone" alt="@me" />
+    <ServerStyles.ServerFrame>
+      <ServerStyles.ServerNav>
+        <Link
+          to="/discord-clone/server/@me"
+          aria-current={isHome}
+          key="@me"
+        >
+          <ServerIcon serverName="Home" src="gone" alt="@me" serverActive={isHome} isDefault />
+        </Link>
+
         <div className="line" />
         {servers.map((server) => (
           <Link
-            to={`/discord-clone/server/${server.serverKey}/fake-channel`}
-            aria-current={server.serverKey === serverKey ? 'true' : 'false'}
+            to={`/discord-clone/server/${server.serverKey}`}
+            aria-current={server.serverKey === serverKey}
             key={server.serverKey}
           >
             <ServerIcon
               serverName={server.serverName}
               src={server.iconURL}
               alt={server.altText}
+              serverActive={server.serverKey === serverKey}
             />
           </Link>
         ))}
-        <ServerIcon serverName="New Server" src="gone" alt="create" />
-        <ServerIcon serverName="Find Server" src="gone" alt="browse" />
-      </ServerNav>
-      <HeaderBar>
-        <div>Server Name</div>
-        <div>
-          <span className="symbolled">My-channel</span>
-          <div className="line" />
-          <span className="channel-desc">Speak your piece</span>
+        { /* eslint-disable-next-line jsx-a11y/click-events-have-key-events */ }
+        <div
+          role="button"
+          tabIndex="0"
+          onClick={() => {
+            modals.createServerModal(currentUser, (nextServerkey, nextChannelKey) => {
+              navigate(`/discord-clone/server/${nextServerkey}/${nextChannelKey}`);
+            });
+          }}
+        >
+          <ServerIcon
+            serverName="New Server"
+            src="gone"
+            alt="Create"
+            isDefault
+          />
         </div>
-      </HeaderBar>
-      <ChannelNav>
+        <Link
+          to="/discord-clone/server/@browse"
+          aria-current={isBrowser}
+          key="@browse"
+        >
+          <ServerIcon
+            serverName="Find Server"
+            src="gone"
+            alt="Browse"
+            serverActive={isBrowser}
+            isDefault
+          />
+        </Link>
+      </ServerStyles.ServerNav>
+      <ServerStyles.HeaderBar>
+        <div className="server-bar">{currentServer.serverName}</div>
+        <div className="channel-bar">
+          <span className="symbolled">{currentChannel.channelName}</span>
+          <div className="line" />
+          <span className="channel-desc">{currentChannel.channelDesc}</span>
+          {willShowContent && (currentUser.isOwner || currentUser.isAdmin) && (
+          <ServerStyles.TopNavButton
+            className="edit-server"
+            type="button"
+            onClick={() => {
+              modals.editServerModal(currentServer);
+            }}
+          >
+            Edit Server
+          </ServerStyles.TopNavButton>
+          )}
+          {willShowContent && (currentUser.isOwner) && (
+          <ServerStyles.TopNavButton
+            className="delete-server"
+            type="button"
+            onClick={() => {
+              modals.deleteServerModal(currentServer, () => {
+                navigate('/discord-clone/server/@me');
+              });
+            }}
+          >
+            Delete Server
+          </ServerStyles.TopNavButton>
+          ) }
+          {willShowContent && (!currentUser.isOwner) && (
+          <ServerStyles.TopNavButton
+            className="leave-server"
+            type="button"
+            onClick={() => {
+              modals.leaveServerModal(currentServer, currentUser, () => {
+                navigate('/discord-clone/server/@me');
+              });
+            }}
+          >
+            Leave Server
+          </ServerStyles.TopNavButton>
+          ) }
+          {willShowContent && (currentUser.isOwner || currentUser.isAdmin) && (
+          <ServerStyles.TopNavButton
+            className="edit-channel"
+            type="button"
+            onClick={() => {
+              modals.editChannelModal(currentChannel);
+            }}
+          >
+            Edit Channel
+          </ServerStyles.TopNavButton>
+          )}
+          {willShowContent && (currentUser.isOwner || currentUser.isAdmin) && (
+          <ServerStyles.TopNavButton
+            className="delete-channel"
+            type="button"
+            onClick={() => {
+              modals.deleteChannelModal(
+                currentChannel,
+                channels,
+                (nextServerkey, nextChannelKey) => {
+                  navigate(`/discord-clone/server/${nextServerkey}/${nextChannelKey}`);
+                },
+              );
+            }}
+          >
+            Delete Channel
+          </ServerStyles.TopNavButton>
+          )}
+          <ServerStyles.LogOutButton
+            className="signout"
+            type="button"
+            onClick={() => {
+              modals.signOutModal(() => {
+                navigate('/discord-clone/login');
+              });
+            }}
+          >
+            Log Out
+          </ServerStyles.LogOutButton>
+        </div>
+      </ServerStyles.HeaderBar>
+      <ServerStyles.ChannelNav>
+        {(currentUser.isOwner || currentUser.isAdmin) && (
+        <ServerStyles.NewChannelButton
+          className="create-channel"
+          type="button"
+          onClick={() => {
+            modals.createChannelModal(currentServer, (nextServerkey, nextChannelKey) => {
+              navigate(`/discord-clone/server/${nextServerkey}/${nextChannelKey}`);
+            });
+          }}
+        >
+          Create Channel
+        </ServerStyles.NewChannelButton>
+        )}
         {channels.map((channel) => (
           <Link
             to={`/discord-clone/server/${serverKey}/${channel.channelKey}`}
             key={channel.channelKey}
             aria-current={channel.channelKey === channelKey ? 'true' : 'false'}
           >
-            <Channel>
+            <ServerStyles.Channel>
               <span className="symbolled">{channel.channelName}</span>
-            </Channel>
+            </ServerStyles.Channel>
           </Link>
         ))}
-      </ChannelNav>
-      <UserPanel>
-        User
-      </UserPanel>
-      <MainContent onWheelCapture={onContentScroll} ref={mainRef}>
+      </ServerStyles.ChannelNav>
+      <ServerStyles.UserPanel onClick={() => {
+        modals.editUserModal(currentUser);
+      }}
+      >
+        <img src={currentUser.icon} alt="U" />
+        <span>{currentUser.name}</span>
+      </ServerStyles.UserPanel>
+      {willShowContent && (
+      <ServerStyles.MainContent onWheelCapture={onContentScroll} ref={mainRef}>
         {
           messages.map((message) => (
             <Message
@@ -234,17 +480,34 @@ function Home() {
               deleted={message.deleted}
               key={message.messageKey}
               isRoot={message.isRoot}
+              isModerator={currentUser.isOwner || currentUser.isAdmin || currentUser.isModerator}
+              deleteFunc={() => {
+                modals.deleteMessageModal(currentChannel, message);
+              }}
             />
           ))
         }
-      </MainContent>
-      <InputBox>
-        <textarea type="text" placeholder="Message #Channel-name" onKeyUp={textSubmit} />
-      </InputBox>
-      <UserList>
-        UserList
-      </UserList>
-    </ServerFrame>
+      </ServerStyles.MainContent>
+      )}
+      {!willShowContent && (
+      <ServerStyles.BlankMain>
+        {isBrowser && <ServerBrowser userKey={currentUser.uid} />}
+      </ServerStyles.BlankMain>
+      )}
+      {willShowContent && (
+      <ServerStyles.InputBox>
+        <textarea type="text" placeholder={`Message #${currentChannel.channelName}`} onKeyUp={textSubmit} />
+      </ServerStyles.InputBox>
+      )}
+      <ServerStyles.UserList>
+        {willShowContent && (
+        <UserList
+          serverKey={currentServer.serverKey}
+          selfKey={currentUser.uid}
+        />
+        )}
+      </ServerStyles.UserList>
+    </ServerStyles.ServerFrame>
   );
 }
 

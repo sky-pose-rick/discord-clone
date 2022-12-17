@@ -1,8 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import FirestoreUser from './logic/FirestoreUser';
+// import FirestoreUser from './logic/FirestoreUser';
+
 import './styles/index.css';
 import App from './App';
+// import FirebaseAuthUser from './logic/FirebaseAuthUser';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -16,7 +18,7 @@ ReactDOM.render(
   FirestoreUser.pushFakeContent();
 }, 750); */
 
-let counter = 0;
+/* let counter = 0;
 
 document.addEventListener('keyup', (e) => {
   if (e.code === 'Numpad7') {
@@ -35,4 +37,11 @@ document.addEventListener('keyup', (e) => {
       messageKey: `genned-message-${counter}`,
     });
   }
-});
+
+  if (e.code === 'Numpad3') {
+    console.log('Num 3');
+    counter += 1;
+    // console.log(textContent);
+    FirebaseAuthUser.logoutUser();
+  }
+}); */
