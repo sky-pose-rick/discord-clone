@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import RegisterStyles from '../component-styles/RegisterStyles';
 import FirebaseAuthUser from '../logic/FirebaseAuthUser';
 
@@ -52,7 +52,7 @@ function Login() {
       </form>
       <div>
         Need an account?
-        <a href="/register">Register</a>
+        <Link to="/register">Register</Link>
       </div>
     </FormBox>
   );

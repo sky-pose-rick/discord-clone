@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import RegisterStyles from '../component-styles/RegisterStyles';
 import FirebaseAuthUser from '../logic/FirebaseAuthUser';
 import FirestoreUser from '../logic/FirestoreUser';
@@ -72,7 +72,7 @@ function Register() {
         <button type="submit">Continue</button>
       </form>
       <div>
-        <a href="/login">Already have an account?</a>
+        <Link to="/login">Already have an account?</Link>
       </div>
       <div className="policy">
         By registering, you agree to not make a mess of this project.
