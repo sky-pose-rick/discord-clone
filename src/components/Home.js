@@ -299,7 +299,7 @@ function Home() {
     <ServerStyles.ServerFrame>
       <ServerStyles.ServerNav>
         <Link
-          to="/discord-clone/server/@me"
+          to="/server/@me"
           aria-current={isHome}
           key="@me"
         >
@@ -309,7 +309,7 @@ function Home() {
         <div className="line" />
         {servers.map((server) => (
           <Link
-            to={`/discord-clone/server/${server.serverKey}`}
+            to={`/server/${server.serverKey}`}
             aria-current={server.serverKey === serverKey}
             key={server.serverKey}
           >
@@ -327,7 +327,7 @@ function Home() {
           tabIndex="0"
           onClick={() => {
             modals.createServerModal(currentUser, (nextServerkey, nextChannelKey) => {
-              navigate(`/discord-clone/server/${nextServerkey}/${nextChannelKey}`);
+              navigate(`/server/${nextServerkey}/${nextChannelKey}`);
             });
           }}
         >
@@ -339,7 +339,7 @@ function Home() {
           />
         </div>
         <Link
-          to="/discord-clone/server/@browse"
+          to="/server/@browse"
           aria-current={isBrowser}
           key="@browse"
         >
@@ -375,7 +375,7 @@ function Home() {
             type="button"
             onClick={() => {
               modals.deleteServerModal(currentServer, () => {
-                navigate('/discord-clone/server/@me');
+                navigate('/server/@me');
               });
             }}
           >
@@ -388,7 +388,7 @@ function Home() {
             type="button"
             onClick={() => {
               modals.leaveServerModal(currentServer, currentUser, () => {
-                navigate('/discord-clone/server/@me');
+                navigate('/server/@me');
               });
             }}
           >
@@ -415,7 +415,7 @@ function Home() {
                 currentChannel,
                 channels,
                 (nextServerkey, nextChannelKey) => {
-                  navigate(`/discord-clone/server/${nextServerkey}/${nextChannelKey}`);
+                  navigate(`/server/${nextServerkey}/${nextChannelKey}`);
                 },
               );
             }}
@@ -428,7 +428,7 @@ function Home() {
             type="button"
             onClick={() => {
               modals.signOutModal(() => {
-                navigate('/discord-clone/login');
+                navigate('/login');
               });
             }}
           >
@@ -443,7 +443,7 @@ function Home() {
           type="button"
           onClick={() => {
             modals.createChannelModal(currentServer, (nextServerkey, nextChannelKey) => {
-              navigate(`/discord-clone/server/${nextServerkey}/${nextChannelKey}`);
+              navigate(`/server/${nextServerkey}/${nextChannelKey}`);
             });
           }}
         >
@@ -452,7 +452,7 @@ function Home() {
         )}
         {channels.map((channel) => (
           <Link
-            to={`/discord-clone/server/${serverKey}/${channel.channelKey}`}
+            to={`/server/${serverKey}/${channel.channelKey}`}
             key={channel.channelKey}
             aria-current={channel.channelKey === channelKey ? 'true' : 'false'}
           >

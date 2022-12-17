@@ -40,7 +40,7 @@ function Register() {
       // create user in firestore
       await FirestoreUser.createNewUser(newUser.uid, newUser.displayName);
       // TODO: navigate to neutral location
-      navigate('/discord-clone/server/@me');
+      navigate('/server/@me');
     });
   };
 
@@ -72,7 +72,7 @@ function Register() {
         <button type="submit">Continue</button>
       </form>
       <div>
-        <a href="/discord-clone/login">Already have an account?</a>
+        <a href="/login">Already have an account?</a>
       </div>
       <div className="policy">
         By registering, you agree to not make a mess of this project.

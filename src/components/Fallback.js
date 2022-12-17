@@ -8,7 +8,7 @@ function Fallback() {
   useEffect(() => {
     console.log('Invalid location', location);
     console.log('Forced re-direct');
-    navigate('/discord-clone/server/@me');
+    navigate('/server/@me');
   }, []);
 
   return (

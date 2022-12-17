@@ -66,7 +66,7 @@ function ServerBrowser(props) {
             key={server.serverKey}
             onClick={() => {
               FirestoreUser.addUserToServer(server.serverKey, userKey).then(() => {
-                navigate(`/discord-clone/server/${server.serverKey}`);
+                navigate(`/server/${server.serverKey}`);
               });
             }}
           >

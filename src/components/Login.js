@@ -24,7 +24,7 @@ function Login() {
     const password = form[1].value;
 
     FirebaseAuthUser.signInUser(email, password, () => {
-      navigate('/discord-clone/server/@me');
+      navigate('/server/@me');
     });
   };
 
@@ -52,7 +52,7 @@ function Login() {
       </form>
       <div>
         Need an account?
-        <a href="/discord-clone/register">Register</a>
+        <a href="/register">Register</a>
       </div>
     </FormBox>
   );

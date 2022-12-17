@@ -10,7 +10,7 @@ function VerifyLogin() {
     FirebaseAuthUser.isSignedIn().then((user) => {
       // console.log('verify login', user);
       if (!user) {
-        navigate('/discord-clone/login');
+        navigate('/login');
       }
     });
   }, []);
