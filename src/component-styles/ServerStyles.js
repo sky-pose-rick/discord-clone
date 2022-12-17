@@ -104,6 +104,10 @@ const ChannelNav = styled.nav`{
   row-gap: 5px;
   overflow: hidden scroll;
   scrollbar-width: none;
+
+  >a{
+    text-decoration: none;
+  }
 }`;
 
 const Channel = styled.div`{
@@ -115,11 +119,6 @@ const Channel = styled.div`{
 
     .symbolled{
       color: #dee1d8;
-    }
-
-    .symbolled::after{
-      content: "G";
-      margin-left: auto;
     }
   }
 
@@ -209,6 +208,28 @@ const BlankMain = styled(MainContent)`
   grid-row: 2/5;
 `;
 
+const TopNavButton = styled.button`
+  background-color: #71737a;
+  color: white;
+  border: none;
+  padding: 6px;
+
+  :active{
+    background-color: #4f4f4f;
+  }
+`;
+
+const LogOutButton = styled(TopNavButton)`
+  color: #f77;
+  font-size: 1.1em;
+  padding: 6px 20px;
+  text-shadow: #111 2px 1px 2px;
+`;
+
+const NewChannelButton = styled(TopNavButton)`
+  margin: 10px 20px;
+`;
+
 export default {
   ServerFrame,
   ServerNav,
@@ -220,4 +241,7 @@ export default {
   InputBox,
   UserList,
   BlankMain,
+  TopNavButton,
+  LogOutButton,
+  NewChannelButton,
 };

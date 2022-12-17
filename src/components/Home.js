@@ -120,7 +120,7 @@ function useChannels(serverKey, willShowContent) {
   return channels;
 }
 
-function useUser(currentServer, willShowContent) {
+function useUser(currentServer) {
   const serverKey = (currentServer) ? currentServer.serverKey : 'dummy-server';
 
   // uid from firestore auth
@@ -157,14 +157,6 @@ function useUser(currentServer, willShowContent) {
   });
 
   useEffect(() => {
-    if (!willShowContent) {
-      setUserInServer({
-        isOwner: false,
-        isModerator: false,
-        isAdmin: false,
-      });
-      return () => {};
-    }
     const unsub = FirestoreUser.subscribeToSelfInServer(
       userKey,
       serverKey,
@@ -367,7 +359,7 @@ function Home() {
           <div className="line" />
           <span className="channel-desc">{currentChannel.channelDesc}</span>
           {willShowContent && (currentUser.isOwner || currentUser.isAdmin) && (
-          <button
+          <ServerStyles.TopNavButton
             className="edit-server"
             type="button"
             onClick={() => {
@@ -375,10 +367,10 @@ function Home() {
             }}
           >
             Edit Server
-          </button>
+          </ServerStyles.TopNavButton>
           )}
           {willShowContent && (currentUser.isOwner) && (
-          <button
+          <ServerStyles.TopNavButton
             className="delete-server"
             type="button"
             onClick={() => {
@@ -388,10 +380,10 @@ function Home() {
             }}
           >
             Delete Server
-          </button>
+          </ServerStyles.TopNavButton>
           ) }
           {willShowContent && (!currentUser.isOwner) && (
-          <button
+          <ServerStyles.TopNavButton
             className="leave-server"
             type="button"
             onClick={() => {
@@ -401,10 +393,10 @@ function Home() {
             }}
           >
             Leave Server
-          </button>
+          </ServerStyles.TopNavButton>
           ) }
           {willShowContent && (currentUser.isOwner || currentUser.isAdmin) && (
-          <button
+          <ServerStyles.TopNavButton
             className="edit-channel"
             type="button"
             onClick={() => {
@@ -412,10 +404,10 @@ function Home() {
             }}
           >
             Edit Channel
-          </button>
+          </ServerStyles.TopNavButton>
           )}
           {willShowContent && (currentUser.isOwner || currentUser.isAdmin) && (
-          <button
+          <ServerStyles.TopNavButton
             className="delete-channel"
             type="button"
             onClick={() => {
@@ -429,9 +421,9 @@ function Home() {
             }}
           >
             Delete Channel
-          </button>
+          </ServerStyles.TopNavButton>
           )}
-          <button
+          <ServerStyles.LogOutButton
             className="signout"
             type="button"
             onClick={() => {
@@ -441,12 +433,12 @@ function Home() {
             }}
           >
             Log Out
-          </button>
+          </ServerStyles.LogOutButton>
         </div>
       </ServerStyles.HeaderBar>
       <ServerStyles.ChannelNav>
         {(currentUser.isOwner || currentUser.isAdmin) && (
-        <button
+        <ServerStyles.NewChannelButton
           className="create-channel"
           type="button"
           onClick={() => {
@@ -456,7 +448,7 @@ function Home() {
           }}
         >
           Create Channel
-        </button>
+        </ServerStyles.NewChannelButton>
         )}
         {channels.map((channel) => (
           <Link
